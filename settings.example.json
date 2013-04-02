@@ -1,0 +1,6 @@
+{
+  "couchdb": {
+    "host": "http://localhost:5984",
+    "database": "cartography"
+  }
+}
