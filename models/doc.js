@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var EventEmitter = require('events').EventEmitter;
 var db = require('./db').db;
 var nano = require('./db').nano;
 
@@ -20,7 +21,12 @@ function getHeaders(id, callback){
 var Doc = function Doc(id){
   if (id) { this.id = id }
   this.tmp = {};
+
+  events.EventEmitter.call(this);
 }
+
+
+Doc.prototype = new EventEmitter();
 
 
 Doc.prototype.validate = function validateDoc(callback){
