@@ -121,20 +121,21 @@ RevisableDoc.prototype.read = function readRevisableDoc(callback){
           return row.value
         });
 
-        return db().fetch({ keys: change_ids }, function(
-          fetch_err, 
-          fetch_result
-        ){
-          if (fetch_err){ return parallel_cb(fetch_err, null) }
-          var up_to_date_fields = {};
+        return db().view('changes', 'field_summary', 
+          { keys: change_ids },
+          function(view_err, view_result){
+            if (view_err){ return parallel_cb(view_err, null) }
+            
+            var up_to_date_fields = {};
 
-          for (i in fetch_result.rows){
-            var field = fetch_result.rows[i].doc.changed.field;
-            up_to_date_fields[field.name] = field.to;
+            for (i in view_result.rows){
+              var field = view_result.rows[i].value;
+              up_to_date_fields[field.name] = field.to;
+            }
+
+            return parallel_cb(null, up_to_date_fields);
           }
-
-          return parallel_cb(null, up_to_date_fields);
-        });
+        );
       });
     }
   ], function(async_error, async_results){

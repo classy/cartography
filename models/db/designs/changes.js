@@ -114,5 +114,14 @@ module.exports = {
           "A relationship's '"+ field_name +"' are not allowed.")
       }
     }
+  },
+  views: {
+    'field_summary': {
+      map: function(doc){
+        if (doc.type == 'change'){
+          emit(doc._id, doc.changed.field);
+        }
+      }
+    }
   }
 }
