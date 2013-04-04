@@ -152,5 +152,33 @@ RevisableDoc.prototype.read = function readRevisableDoc(callback){
 };
 
 
+RevisableDoc.prototype.readField = function readRevisableDocField(
+  field_name, 
+  callback
+){
+  var self = this;
+
+  var field_view_options = {
+    endkey: [self.id, field_name],
+    startkey: [self.id, field_name, {}],
+    descending: true,
+    reduce: false,
+    limit: 1
+  }
+
+  return db().view(
+    'revisables', 
+    'changes_by_changed', 
+    field_view_options, 
+    function(view_err, view_result){
+      if (view_err){ return callback(view_err, null) }
+      if (!view_result.rows.length){ return callback(null, undefined) }
+
+      return callback(null, view_result.rows[0].value.to);
+    }
+  );
+}
+
+
 
 module.exports = RevisableDoc;

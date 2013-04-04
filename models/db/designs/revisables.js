@@ -35,13 +35,16 @@ module.exports = {
           emit([
             doc.changed.doc._id, 
             doc.changed.field.name, 
-            doc.creation_date
-          ], doc._id)
+            doc.creation_date,
+            doc._id
+          ], doc.changed.field)
         }
       },
       
       reduce: function(keys, values, rereduce){
-        return values[0];
+        var key = keys[0];
+        var id = key[key.length -1]
+        return id;
       }
     }
   }
