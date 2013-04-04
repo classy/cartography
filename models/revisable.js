@@ -168,6 +168,78 @@ RevisableDoc.prototype.remove = function removeFromRevisableDocField(
     }
   );
 }
+
+
+RevisableDoc.prototype.set = function setInRevisableDoc(
+  field_name,
+  key,
+  value,
+  callback
+){
+  var self = this;
+
+  self.readField(
+    field_name,
+    function(read_field_err, field_value){
+      if (read_field_err){ return callback(read_field_err, null) }
+      var field_value = field_value || {};
+
+      if (!_.isObject(field_value)){
+        var error = {
+          error: "forbidden",
+          message: "Field '"+ field_name +"' is not an object."
+        }
+
+        return callback(error, null);
+      }
+
+      field_value[key] = value;
+
+      self.change(field_name, field_value, callback);
+    }
+  );
+}
+
+
+RevisableDoc.prototype.unset = function unsetInRevisableDoc(
+  field_name,
+  key,
+  callback  
+){
+  var self = this;
+
+  self.readField(
+    field_name,
+    function(read_field_err, field_value){
+      if (read_field_err){ return callback(read_field_err, null) }
+
+      if (!_.isObject(field_value)){
+        var error = {
+          error: "forbidden",
+          message: "Field '"+ field_name +"' is not an object."
+        }
+
+        return callback(error, null);
+      }
+
+      if (!field_value[key]){
+        var error = {
+          error: "forbidden",
+          message: "'"+ field_name +"' field '"+ key +"' is not set."
+        }
+
+        return callback(error, null);
+      }
+
+      delete field_value[key];
+      field_value = field_value == {} ? undefined : field_value;
+
+      self.change(field_name, field_value, callback);
+    }
+  );
+};
+
+
 RevisableDoc.prototype.read = function readRevisableDoc(callback){
   var self = this;
   var rev_doc = {};
