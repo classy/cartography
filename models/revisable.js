@@ -82,7 +82,11 @@ RevisableDoc.prototype.change = function changeRevisableDoc(
         doc: { _id: self.id, type: self.type },
         field: { name: field_name, to: to }
       }
-    }, callback)
+    }, function(change_err, change_result){
+      if (change_err){ return callback(change_err, null) }
+      self.emit('change', change_result);
+      return callback(change_err, change_result);
+    });
   });
 };
 
@@ -141,6 +145,7 @@ RevisableDoc.prototype.read = function readRevisableDoc(callback){
       rev_doc = _.extend(rev_doc, result);
     }
 
+    self.emit('read', rev_doc);
     return callback(null, rev_doc);
   });
 };

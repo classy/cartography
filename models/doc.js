@@ -53,13 +53,19 @@ Doc.prototype.create = function createDoc(doc_body, callback){
 
       delete self.tmp.doc_body;
       return callback(null, result);
+      this.emit('created', result);
     });
   });
 }
 
 
 Doc.prototype.read = function readDoc(callback){
-  db().get(this.id, callback);
+  var self = this;
+  db().get(self.id, function(get_err, doc){
+    if (get_err) { return callback(get_err, null) }
+    self.emit('read', doc);
+    return callback(null, doc);
+  });
 }
 
 
@@ -121,6 +127,7 @@ Doc.prototype.update = function updateDoc(operation, callback){
             return callback(insert_error, null);
           }
   
+          self.emit('update', insert_result);
           return callback(null, insert_result);
       });
     });
@@ -132,12 +139,15 @@ Doc.prototype.update = function updateDoc(operation, callback){
 
 
 Doc.prototype.delete = function deleteDoc(callback){
-  this.read(function(read_error, doc_body){
+  var self = this;
+
+  self.read(function(read_error, doc_body){
     db().destroy(
       doc_body._id, 
       doc_body._rev, 
       function(destroy_error, destroy_result){
         if (destroy_error){ return callback(destroy_error, null) }
+        self.emit('delete', destroy_result);
         return callback(null, destroy_result);
       });
   });
