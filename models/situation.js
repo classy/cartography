@@ -43,4 +43,18 @@ Situation.prototype.untag = function untagSituation(tag_name, callback){
   self.remove('tags', tag_name, callback);
 }
 
+
+Situation.prototype.mark = function markSituation(mark_name, callback){
+  var self = this;
+  self.set('marked', mark_name, (new Date()).getTime(), callback);
+}
+
+
+Situation.prototype.unmark = function unmarkSituation(mark_name, callback){
+  var self = this;
+  self.unset('marked', mark_name, callback);
+}
+
+
+
 module.exports = Situation
