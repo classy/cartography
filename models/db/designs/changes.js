@@ -69,6 +69,7 @@ module.exports = {
         '_rev',
         'type', 
         'revisable', 
+        'immutable',
         'creation_date'
       ]
 
@@ -113,6 +114,22 @@ module.exports = {
             required(
               typeof tag == 'string',
               "A situation's 'tags' field may only contain strings");
+          }
+        }
+
+        if (field_name == 'marked'){
+
+          required(
+            Object.prototype.toString.call(value) == '[object Object]',
+            "A situation's 'marked' field must be an object.");
+
+          var marks = value;
+          for (key in marks){
+            var mark = marks[key];
+            
+            required(
+              typeof mark == 'number',
+              "A situation's 'marked' keys must return a number");
           }
         }
       }
