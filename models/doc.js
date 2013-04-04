@@ -22,7 +22,7 @@ var Doc = function Doc(id){
   if (id) { this.id = id }
   this.tmp = {};
 
-  events.EventEmitter.call(this);
+  EventEmitter.call(this);
 }
 
 
