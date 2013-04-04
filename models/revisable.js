@@ -91,6 +91,83 @@ RevisableDoc.prototype.change = function changeRevisableDoc(
 };
 
 
+RevisableDoc.prototype.add = function addToRevisableDocField(
+  field_name,
+  element,
+  callback
+){
+  var self = this;
+
+  return self.readField(
+    field_name, 
+    function(read_field_err, value){
+      if (read_field_err){ return callback(read_field_err, null) }
+
+      var value = value || [];
+
+      if (!_.isArray(value)){
+        var error = {
+          error: "forbidden",
+          message: "field '"+ field_name +"' is not an array.",
+        }
+
+        return callback(error, null);
+      }
+
+      if (value.indexOf(element) != -1){
+        var error = {
+          error: "forbidden",
+          message: "Element is already in field '"+ field_name +"'."
+        }
+
+        return callback(error, null);
+      }
+
+      value.push(element);
+
+      return self.change(field_name, value, callback);
+    }
+  );
+}
+
+
+RevisableDoc.prototype.remove = function removeFromRevisableDocField(
+  field_name,
+  element,
+  callback
+){
+  var self = this;
+
+  return self.readField(
+    field_name, 
+    function(read_field_err, value){
+      if (read_field_err){ return callback(read_field_err, null) }
+      if (!_.isArray(value)){
+        var error = {
+          error: "forbidden",
+          message: "field '"+ field_name +"' is not an array.",
+        }
+
+        return callback(error, null);
+      }
+
+      var element_index = value.indexOf(element);
+      if (element_index == -1){
+        var error = {
+          error: "forbidden",
+          message: "Element is not in field '"+ field_name +"'."
+        }
+
+        return callback(error, null);
+      }
+
+      value.splice(element_index, 1);
+      value = value == [] ? undefined : value;
+
+      return self.change(field_name, value, callback);
+    }
+  );
+}
 RevisableDoc.prototype.read = function readRevisableDoc(callback){
   var self = this;
   var rev_doc = {};
