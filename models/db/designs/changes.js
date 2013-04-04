@@ -99,7 +99,21 @@ module.exports = {
 
           required(
             value.length <= 64,
-            "A situation's location may be no more than 64 characters long .");
+            "A situation's location may be no more than 64 characters long.");
+        }
+
+        if (field_name == 'tags'){
+          required(
+            Object.prototype.toString.call(value) === '[object Array]',
+            "A situation's tags field must be an array.")
+
+          for (i in value){
+            var tag = value[i];
+
+            required(
+              typeof tag == 'string',
+              "A situation's 'tags' field may only contain strings");
+          }
         }
       }
 

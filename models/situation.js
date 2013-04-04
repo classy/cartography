@@ -32,5 +32,15 @@ Situation.prototype.create = function createSituation(callback){
 }
 
 
+Situation.prototype.tag = function tagSituation(tag_name, callback){
+  var self = this;
+  self.add('tags', tag_name, callback);
+}
+
+
+Situation.prototype.untag = function untagSituation(tag_name, callback){
+  var self = this;
+  self.remove('tags', tag_name, callback);
+}
 
 module.exports = Situation
