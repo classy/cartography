@@ -2,6 +2,7 @@ var _ = require('lodash');
 var EventEmitter = require('events').EventEmitter;
 var db = require('./db').db;
 var nano = require('./db').nano;
+var search = require('../search');
 
 
 
@@ -67,6 +68,40 @@ Doc.prototype.read = function readDoc(callback){
     return callback(null, doc);
   });
 }
+
+
+Doc.prototype.updateSearchIndex = function updateSearchIndexForDoc(){
+  var self = this;
+  var source = null;
+  var callback = function(){};
+
+  function index(doc){
+    search.client().index(
+      'cartography',
+      self.type,
+      doc,
+      { id: self.id },
+      function(indexing_error, indexing_result){
+        if (indexing_error){ return callback(indexing_error, null) }
+        return callback(null, indexing_result);
+      }
+    );
+  }
+
+  switch(arguments.length){
+    case 1: callback = arguments[0]; break;
+    case 2: callback = arguments[1]; source = arguments[0]; break;
+  }
+
+  if (source){
+    return index(source);
+  }
+
+  self.read(function(doc_read_err, doc_body){
+    if (doc_read_err){ return callback(doc_read_err, null) };
+    return index(doc_body);
+  });
+};
 
 
 Doc.prototype.exists = function(callback){

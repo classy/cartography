@@ -1,0 +1,54 @@
+{
+  "change": {
+    "properties": {
+      "_rev": {
+        "type": "string"
+      },
+      "changed": {
+        "dynamic": "true",
+        "properties": {
+          "doc": {
+            "dynamic": "true",
+            "properties": {
+              "_id": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              }
+            }
+          },
+          "field": {
+            "dynamic": "true",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "to": {
+                "type": "multi_field",
+                "fields": {
+                  "to": {
+                    "type": "string"
+                  },
+                  "to_object": {
+                    "type": "object",
+                    "enabled": false
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "creation_date": {
+        "type": "long"
+      },
+      "immutable": {
+        "type": "boolean"
+      },
+      "type": {
+        "type": "string"
+      }
+    }
+  }
+}
