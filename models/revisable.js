@@ -55,9 +55,21 @@ RevisableDoc.prototype.update = function updateRevisableDoc(
 
 
 RevisableDoc.prototype.change = function changeRevisableDoc(
-  field_name, to, callback
+  field_name, to
 ){
   var self = this;
+  var callback = function(){};
+  var additional_properties = {};
+
+  switch(arguments.length){
+    case 3 : callback = arguments[2]; break;
+    case 4 : {
+      additional_properties = arguments[2]; 
+      callback = arguments[3]; 
+      break;
+    }
+  }
+
   var new_change = new Change();
 
   self.read(function(read_err, doc_body){
@@ -77,26 +89,41 @@ RevisableDoc.prototype.change = function changeRevisableDoc(
       return callback(error, null);
     }
 
-    return new_change.create({
+    var new_change_body = _.extend(additional_properties, {
       changed: {
         doc: { _id: self.id, type: self.type },
         field: { name: field_name, to: to }
       }
-    }, function(change_err, change_result){
-      if (change_err){ return callback(change_err, null) }
-      self.emit('change', change_result);
-      return callback(change_err, change_result);
     });
+
+    return new_change.create(
+      new_change_body, 
+      function(change_err, change_result){
+        if (change_err){ return callback(change_err, null) }
+        self.emit('change', change_result);
+        return callback(change_err, change_result);
+      }
+    );
   });
 };
 
 
 RevisableDoc.prototype.add = function addToRevisableDocField(
   field_name,
-  element,
-  callback
+  element
 ){
   var self = this;
+  var callback = function(){};
+  var additional_properties = {};
+
+  switch(arguments.length){
+    case 3 : callback = arguments[2]; break;
+    case 4 : {
+      additional_properties = arguments[2]; 
+      callback = arguments[3]; 
+      break;
+    }
+  }
 
   return self.readField(
     field_name, 
@@ -125,7 +152,7 @@ RevisableDoc.prototype.add = function addToRevisableDocField(
 
       value.push(element);
 
-      return self.change(field_name, value, callback);
+      return self.change(field_name, value, additional_properties, callback);
     }
   );
 }
@@ -133,10 +160,21 @@ RevisableDoc.prototype.add = function addToRevisableDocField(
 
 RevisableDoc.prototype.remove = function removeFromRevisableDocField(
   field_name,
-  element,
-  callback
+  element
 ){
   var self = this;
+  var callback = function(){};
+  var additional_properties = {};
+
+  switch(arguments.length){
+    case 3 : callback = arguments[2]; break;
+    case 4 : {
+      additional_properties = arguments[2]; 
+      callback = arguments[3]; 
+      break;
+    }
+  }
+
 
   return self.readField(
     field_name, 
@@ -164,7 +202,7 @@ RevisableDoc.prototype.remove = function removeFromRevisableDocField(
       value.splice(element_index, 1);
       value = value == [] ? undefined : value;
 
-      return self.change(field_name, value, callback);
+      return self.change(field_name, value, additional_properties, callback);
     }
   );
 }
@@ -173,10 +211,20 @@ RevisableDoc.prototype.remove = function removeFromRevisableDocField(
 RevisableDoc.prototype.set = function setInRevisableDoc(
   field_name,
   key,
-  value,
-  callback
+  value
 ){
   var self = this;
+  var callback = function(){};
+  var additional_properties = {};
+
+  switch(arguments.length){
+    case 4 : callback = arguments[3]; break;
+    case 5 : {
+      additional_properties = arguments[3]; 
+      callback = arguments[4]; 
+      break;
+    }
+  }
 
   self.readField(
     field_name,
@@ -195,7 +243,7 @@ RevisableDoc.prototype.set = function setInRevisableDoc(
 
       field_value[key] = value;
 
-      self.change(field_name, field_value, callback);
+      self.change(field_name, field_value, additional_properties, callback);
     }
   );
 }
@@ -203,10 +251,20 @@ RevisableDoc.prototype.set = function setInRevisableDoc(
 
 RevisableDoc.prototype.unset = function unsetInRevisableDoc(
   field_name,
-  key,
-  callback  
+  key
 ){
   var self = this;
+  var callback = function(){};
+  var additional_properties = {};
+
+  switch(arguments.length){
+    case 3 : callback = arguments[2]; break;
+    case 4 : {
+      additional_properties = arguments[2]; 
+      callback = arguments[3]; 
+      break;
+    }
+  }
 
   self.readField(
     field_name,
@@ -234,7 +292,7 @@ RevisableDoc.prototype.unset = function unsetInRevisableDoc(
       delete field_value[key];
       field_value = field_value == {} ? undefined : field_value;
 
-      self.change(field_name, field_value, callback);
+      self.change(field_name, field_value, additional_properties, callback);
     }
   );
 };
