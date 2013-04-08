@@ -34,25 +34,46 @@ Situation.prototype.create = function createSituation(callback){
 
 Situation.prototype.tag = function tagSituation(tag_name, callback){
   var self = this;
-  self.add('tags', tag_name, callback);
+  self.add(
+    'tags', 
+    tag_name, 
+    { summary: "Tagged '"+ tag_name +"'" },
+    callback
+  );
 }
 
 
 Situation.prototype.untag = function untagSituation(tag_name, callback){
   var self = this;
-  self.remove('tags', tag_name, callback);
+  self.remove(
+    'tags', 
+    tag_name, 
+    { summary: "Removed tag '"+ tag_name +"'" },
+    callback
+  );
 }
 
 
 Situation.prototype.mark = function markSituation(mark_name, callback){
   var self = this;
-  self.set('marked', mark_name, (new Date()).getTime(), callback);
+  self.set(
+    'marked', 
+    mark_name, 
+    (new Date()).getTime(), 
+    { summary: "Marked '"+ mark_name.replace('_',' ') +"'" },
+    callback
+  );
 }
 
 
 Situation.prototype.unmark = function unmarkSituation(mark_name, callback){
   var self = this;
-  self.unset('marked', mark_name, callback);
+  self.unset(
+    'marked', 
+    mark_name, 
+    { summary: "Removed mark '"+ mark_name.replace('_',' ') +"'" },
+    callback
+  );
 }
 
 
