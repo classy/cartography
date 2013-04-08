@@ -61,33 +61,5 @@ Relationship.prototype.validate = function validateRelationship(callback){
 }
 
 
-Relationship.prototype.read = function readRelationship(callback){
-  RevisableDoc.prototype.read.call(this, function(read_err, relationship_body){
-    if (read_err){ return callback(read_err, null) }
-    
-    var cause = new Situation(relationship_body.cause._id);
-    var effect = new Situation(relationship_body.effect._id);
-
-    async.parallel([
-      function readCause(parallel_cb){
-        cause.read(parallel_cb);
-      },
-      function readEffect(parallel_cb){
-        effect.read(parallel_cb);
-      },
-    ], function(parallel_error, parallel_results){
-      if (parallel_error){ return callback(parallel_error, null) }
-
-      parallel_results.forEach(function(situation){
-        var relation = cause.id == situation._id ? 'cause' : 'effect';
-        relationship_body[relation] = situation;
-      });
-
-      return callback(null, relationship_body);
-    });
-  });
-}
-
-
 
 module.exports = Relationship;
