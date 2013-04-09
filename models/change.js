@@ -42,5 +42,27 @@ Change.prototype.create = function createChange(doc_body, callback){
 }
 
 
+Change.prototype.updateSearchIndex = function updateSearchIndexForChange(
+  callback
+){
+  var self = this;
+  callback = callback || function(){};
+
+  self.read(function(doc_read_err, doc_body){
+    if (doc_read_err){ return callback(doc_read_err, null) };
+
+    if (typeof doc_body.changed.field.to != 'string'){
+      delete doc_body.changed.field.to;
+    }
+
+    return ImmutableDoc.prototype.updateSearchIndex.call(
+      self,
+      doc_body, 
+      callback
+    );
+  });
+}
+
+
 
 module.exports = Change
