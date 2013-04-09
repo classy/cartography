@@ -52,8 +52,9 @@ Doc.prototype.create = function createDoc(doc_body, callback){
       self.id = result.id;
 
       delete self.tmp.doc_body;
+
+      self.emit('create', result);
       return callback(null, result);
-      this.emit('created', result);
     });
   });
 }
@@ -82,6 +83,8 @@ Doc.prototype.updateSearchIndex = function updateSearchIndexForDoc(){
       { id: self.id },
       function(indexing_error, indexing_result){
         if (indexing_error){ return callback(indexing_error, null) }
+
+        self.emit('updateSearchIndex', indexing_result);
         return callback(null, indexing_result);
       }
     );
