@@ -7,6 +7,15 @@ var design = require('./db/designs/situations');
 var Situation = function Situation(id){
   if (id) { this.id = id; }
   this.type = 'situation';
+  var self = this;
+
+  this.on('change', function(change_result){
+    self.updateSearchIndex();
+  });
+
+  this.on('delete', function(deletion_result){
+    self.deleteFromSearchIndex();
+  });
 }
 
 
