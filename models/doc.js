@@ -106,6 +106,24 @@ Doc.prototype.updateSearchIndex = function updateSearchIndexForDoc(){
 };
 
 
+Doc.prototype.deleteFromSearchIndex = function deleteDocFromSearchIndex(
+  callback
+){
+  var self = this;
+  callback = callback || function(){};
+
+  search.client().delete(
+    'cartography',
+    self.type,
+    self.id,
+    function(deletion_error, deletion_result){
+      if (deletion_error){ return callback(deletion_error, null) }
+      return callback(null, deletion_result);
+    }
+  );
+}
+
+
 Doc.prototype.exists = function(callback){
   if (!this.id){ return callback(null, false) }
   getHeaders(this.id, function(header_error, headers){
