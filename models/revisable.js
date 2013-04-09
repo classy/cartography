@@ -4,6 +4,7 @@ var async = require('async');
 var db = require('./db').db;
 
 var design = require('./db/designs/revisables');
+var Doc = require('./doc');
 var ImmutableDoc = require('./immutable');
 var Change = require('./change');
 
@@ -106,6 +107,54 @@ RevisableDoc.prototype.change = function changeRevisableDoc(
     );
   });
 };
+
+
+RevisableDoc.prototype.delete = function deleteRevisableDoc(callback){
+  var self = this;
+
+  var view_options = {
+    startkey: [self.id],
+    endkey: [self.id, {}],
+    include_docs: true,
+    reduce: false
+  }
+
+  db().view(
+    'revisables', 
+    'changes_by_changed', 
+    view_options, 
+    function(view_error, view_result){
+      if (view_error){ return callback(view_error, null) }
+      
+      var docs = view_result.rows.map(function(row){
+        var doc = _.clone(row.doc);
+        doc._deleted = true;
+        return doc;
+      });
+
+      db().bulk({ docs: docs }, function(bulk_error, bulk_delete){
+        if (bulk_error){ return callback(bulk_error, null) }
+
+        docs.map(function(doc_body){
+          var change = new Change(doc_body._id);
+          change.emit('delete');
+        });
+
+        // var delete_from_search_index_operations = docs.map(function(doc){
+        //   return {
+        //     index: 'cartography',
+        //     type: 'change',
+        //     id: doc._id
+        //   }
+        // });
+
+        // search.client().bulk(delete_from_search_index_operations, console.log);
+
+        Doc.prototype.delete.call(self, callback)
+      });
+    }
+  );
+}
 
 
 RevisableDoc.prototype.add = function addToRevisableDocField(
