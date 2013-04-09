@@ -189,20 +189,5 @@ Doc.prototype.delete = function deleteDoc(callback){
 }
 
 
-// Doc.create = function createDoc(){
-//   var callback = arguments.length ? arguments[arguments.length -1] : null;
-//   var properties = arguments.length >= 2 ? arguments[0] : {};
-// 
-//   db().insert(properties, function(insert_error, result){
-//     if (insert_error){
-//       return callback(insert_error, null);
-//     }
-// 
-//     var new_doc = new Doc(result.id);
-//     return callback(null, new_doc);
-//   });
-// }
-
-
 
 module.exports = Doc
