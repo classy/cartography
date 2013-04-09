@@ -202,6 +202,9 @@ Doc.prototype.delete = function deleteDoc(callback){
       doc_body._rev, 
       function(destroy_error, destroy_result){
         if (destroy_error){ return callback(destroy_error, null) }
+
+        destroy_result.doc_body = doc_body;
+
         self.emit('delete', destroy_result);
         return callback(null, destroy_result);
       });
