@@ -11,6 +11,20 @@ var Situation = require('./situation');
 var Relationship = function Relationship(id){
   if (id) { this.id = id; }
   this.type = 'relationship';
+
+  var self = this;
+
+  this.on('create', function(){
+    self.updateSearchIndex();
+  });
+
+  this.on('change', function(change_result){
+    self.updateSearchIndex();
+  });
+
+  this.on('delete', function(deletion_result){
+    self.deleteFromSearchIndex();
+  });
 }
 
 
@@ -59,6 +73,46 @@ Relationship.prototype.validate = function validateRelationship(callback){
     return callback(null, true);
   });
 }
+
+
+function updateSearchIndexForRelationship(callback){
+  var self = this;
+  var source = null;
+  var callback = callback || function(){};
+
+  self.read(function(read_err, rel_body){
+    if (read_err){ return callback(read_err, null) }
+
+    var cause = new Situation(rel_body.cause._id);
+    var effect = new Situation(rel_body.effect._id);
+
+    async.parallel([
+      function(parallel_cb){
+        cause.readField('title', function(read_field_err, title){
+          if (read_field_err){ return parallel_cb(read_field_err, null) }
+          rel_body.cause.title = title;
+          parallel_cb(null, title);
+        });
+      },
+      function(parallel_cb){
+        effect.readField('title', function(read_field_err, title){
+          if (read_field_err){ return parallel_cb(read_field_err, null) }
+          rel_body.effect.title = title;
+          parallel_cb(null, title);
+        });
+      }
+    ], function(parallel_error, parallel_result){
+      if (parallel_error){ return callback(parallel_error, null) }
+      return Doc.prototype.updateSearchIndex.call(
+        self,
+        rel_body,
+        callback
+      );
+    });
+  });
+}
+
+Relationship.prototype.updateSearchIndex = updateSearchIndexForRelationship;
 
 
 
