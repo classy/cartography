@@ -45,5 +45,5 @@ module.exports = {
         typeof new_doc.effect._id == 'string',
         "'effect._id' must be a string.");
     }
-  },
+  }
 }
