@@ -3,6 +3,7 @@ var async = require('async');
 
 var db = require('./db').db;
 
+var search = require('../search');
 var design = require('./db/designs/revisables');
 var Doc = require('./doc');
 var ImmutableDoc = require('./immutable');
@@ -423,6 +424,22 @@ RevisableDoc.prototype.readField = function readRevisableDocField(
       return callback(null, view_result.rows[0].value.to);
     }
   );
+}
+
+
+RevisableDoc.prototype.changes = function listRevisableDocChanges(callback){
+  var self = this;
+  var search_client = search.client();
+
+  search_client.search({
+    type: "change",
+    sort: [
+      { creation_date: "desc" }
+    ],
+    filter: {
+      term: { "changed.doc._id": self.id }
+    }
+  }, callback);
 }
 
 

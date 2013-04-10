@@ -1,3 +1,4 @@
+var search = require('../search');
 var RevisableDoc = require('./revisable');
 
 var design = require('./db/designs/situations');
@@ -83,6 +84,38 @@ Situation.prototype.unmark = function unmarkSituation(mark_name, callback){
     { summary: "Removed mark '"+ mark_name.replace('_',' ') +"'" },
     callback
   );
+}
+
+
+Situation.prototype.causes = function listSituationCauses(callback){
+  var self = this;
+  var search_client = search.client();
+
+  search_client.search({
+    type: "relationship",
+    sort: [
+      { creation_date: "desc" }
+    ],
+    filter: {
+      term: { "cause._id": self.id }
+    }
+  }, callback);
+}
+
+
+Situation.prototype.effects = function listSituationEffects(callback){
+  var self = this;
+  var search_client = search.client();
+
+  search_client.search({
+    type: "relationship",
+    sort: [
+      { creation_date: "desc" }
+    ],
+    filter: {
+      term: { "effect._id": self.id }
+    }
+  }, callback);
 }
 
 
