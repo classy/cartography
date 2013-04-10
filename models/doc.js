@@ -35,10 +35,15 @@ Doc.prototype.validate = function validateDoc(callback){
 
 
 Doc.prototype.create = function createDoc(doc_body, callback){
-  doc_body = doc_body || {};
-  doc_body.type = this.type;
-
   var self = this;
+
+  switch(arguments.length){
+    case 0: var callback = function(){}; var doc_body = {}; break;
+    case 1: var callback = arguments[0]; var doc_body = {}; break;
+    case 2: var callback = arguments[1]; var doc_body = arguments[0]; break;
+  }
+
+  doc_body.type = this.type;
 
   self.tmp.doc_body = doc_body;
   self.validate(function(validation_error, validation_result){
