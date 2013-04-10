@@ -140,16 +140,6 @@ RevisableDoc.prototype.delete = function deleteRevisableDoc(callback){
           change.emit('delete');
         });
 
-        // var delete_from_search_index_operations = docs.map(function(doc){
-        //   return {
-        //     index: 'cartography',
-        //     type: 'change',
-        //     id: doc._id
-        //   }
-        // });
-
-        // search.client().bulk(delete_from_search_index_operations, console.log);
-
         Doc.prototype.delete.call(self, callback)
       });
     }
