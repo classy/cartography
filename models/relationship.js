@@ -120,35 +120,9 @@ function updateSearchIndexForRelationship(callback){
   var source = null;
   var callback = callback || function(){};
 
-  self.read(function(read_err, rel_body){
-    if (read_err){ return callback(read_err, null) }
-
-    var cause = new RevisableDoc(rel_body.cause._id);
-    var effect = new RevisableDoc(rel_body.effect._id);
-
-    async.parallel([
-      function(parallel_cb){
-        cause.readField('title', function(read_field_err, title){
-          if (read_field_err){ return parallel_cb(read_field_err, null) }
-          rel_body.cause.title = title;
-          parallel_cb(null, title);
-        });
-      },
-      function(parallel_cb){
-        effect.readField('title', function(read_field_err, title){
-          if (read_field_err){ return parallel_cb(read_field_err, null) }
-          rel_body.effect.title = title;
-          parallel_cb(null, title);
-        });
-      }
-    ], function(parallel_error, parallel_result){
-      if (parallel_error){ return callback(parallel_error, null) }
-      return Doc.prototype.updateSearchIndex.call(
-        self,
-        rel_body,
-        callback
-      );
-    });
+  self.summerize(function(summerization_error, rel_summary){
+    if (summerization_error){ return callback(summerization_error, null) }
+    Doc.prototype.updateSearchIndex.call(self, rel_summary, callback);
   });
 }
 
