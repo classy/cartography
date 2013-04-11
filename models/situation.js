@@ -95,6 +95,40 @@ Situation.prototype.summarize = function summarizeSituation(callback){
 }
 
 
+Situation.prototype.title = function changeSituationTitle(title, callback){
+  var self = this;
+
+  return self._change('title', title, callback);
+}
+
+
+Situation.prototype.period = function changeSituationPeriod(period, callback){
+  var self = this;
+
+  return self._change('period', period, callback);
+}
+
+
+Situation.prototype.location = function changeSituationLocation(
+  location, 
+  callback
+){
+  var self = this;
+
+  return self._change('location', location, callback);
+}
+
+
+Situation.prototype.description = function changeSituationDescription(
+  description, 
+  callback
+){
+  var self = this;
+
+  return self._change('description', description, callback);
+}
+
+
 Situation.prototype.tag = function tagSituation(tag_name, callback){
   var self = this;
   self._add(
