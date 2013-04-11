@@ -102,7 +102,7 @@ RevisableDoc.prototype.change = function changeRevisableDoc(
       new_change_body, 
       function(change_err, change_result){
         if (change_err){ return callback(change_err, null) }
-        self.emit('change', change_result);
+        self.emit('change', new_change_body.changed.field, change_result);
         return callback(change_err, change_result);
       }
     );
