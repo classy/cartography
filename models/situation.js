@@ -16,7 +16,11 @@ var Situation = function Situation(id){
   self.on('change', function(field, change_result){
     self.updateSearchIndex();
 
-    if (field.name == 'title'){
+    if (
+      field.name == 'title' ||
+      field.name == 'location' ||
+      field.name == 'period'
+    ){
       self.relationships(function(search_error, search_result){
         // TODO: this really should report the problem or something if there is
         // an error conducting the search.
