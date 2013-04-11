@@ -427,6 +427,30 @@ RevisableDoc.prototype.readField = function readRevisableDocField(
 }
 
 
+RevisableDoc.prototype.readFields = function readRevisableDocFields(
+  field_names,
+  callback
+){
+  var self = this;
+  var fields = {};
+
+  var async_ops = field_names.map(function(field_name){
+    return function(async_cb){
+      self.readField(field_name, function(read_field_error, field_value){
+        if (read_field_error){ async_cb(read_field_error, null) }
+        fields[field_name] = field_value;
+        return async_cb(null, field_value);
+      });
+    }
+  });
+
+  async.parallel(async_ops, function(async_error, async_result){
+    if (async_error){ return callback(async_error, null) }
+    return callback(null, fields);
+  });
+}
+
+
 RevisableDoc.prototype.changes = function listRevisableDocChanges(callback){
   var self = this;
   var search_client = search.client();
