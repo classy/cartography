@@ -1,4 +1,6 @@
+var _ = require('lodash');
 var search = require('../search');
+var Doc = require('./doc');
 var RevisableDoc = require('./revisable');
 var Relationship = require('./relationship');
 
@@ -65,6 +67,27 @@ Situation.prototype.validate = function validateSituation(callback){
 Situation.prototype.create = function createSituation(callback){
   var self = this;
   return RevisableDoc.prototype.create.call(self, {}, callback);
+}
+
+
+Situation.prototype.summerize = function summerizeSituation(callback){
+  var self = this;
+
+  var doc = new Doc(self.id);
+
+  doc.read(function(read_error, doc_body){
+    if (read_error){ return callback(read_error, null) }
+
+    self.readFields(['title', 'location', 'period'], function(
+      read_fields_error, 
+      fields
+    ){
+      if (read_fields_error){ return callback(read_fields_error, null) }
+      _.extend(doc_body, fields);
+
+      return callback(null, doc_body);
+    });
+  });
 }
 
 
