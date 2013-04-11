@@ -56,7 +56,7 @@ RevisableDoc.prototype.update = function updateRevisableDoc(
 }
 
 
-RevisableDoc.prototype.change = function changeRevisableDoc(
+RevisableDoc.prototype._change = function changeRevisableDoc(
   field_name, to
 ){
   var self = this;
@@ -148,7 +148,7 @@ RevisableDoc.prototype.delete = function deleteRevisableDoc(callback){
 }
 
 
-RevisableDoc.prototype.add = function addToRevisableDocField(
+RevisableDoc.prototype._add = function addToRevisableDocField(
   field_name,
   element
 ){
@@ -198,7 +198,7 @@ RevisableDoc.prototype.add = function addToRevisableDocField(
 }
 
 
-RevisableDoc.prototype.remove = function removeFromRevisableDocField(
+RevisableDoc.prototype._remove = function removeFromRevisableDocField(
   field_name,
   element
 ){
@@ -248,7 +248,7 @@ RevisableDoc.prototype.remove = function removeFromRevisableDocField(
 }
 
 
-RevisableDoc.prototype.set = function setInRevisableDoc(
+RevisableDoc.prototype._set = function setInRevisableDoc(
   field_name,
   key,
   value
@@ -289,7 +289,7 @@ RevisableDoc.prototype.set = function setInRevisableDoc(
 }
 
 
-RevisableDoc.prototype.unset = function unsetInRevisableDoc(
+RevisableDoc.prototype._unset = function unsetInRevisableDoc(
   field_name,
   key
 ){

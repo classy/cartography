@@ -97,7 +97,7 @@ Situation.prototype.summarize = function summarizeSituation(callback){
 
 Situation.prototype.tag = function tagSituation(tag_name, callback){
   var self = this;
-  self.add(
+  self._add(
     'tags', 
     tag_name, 
     { summary: "Tagged '"+ tag_name +"'" },
@@ -108,7 +108,7 @@ Situation.prototype.tag = function tagSituation(tag_name, callback){
 
 Situation.prototype.untag = function untagSituation(tag_name, callback){
   var self = this;
-  self.remove(
+  self._remove(
     'tags', 
     tag_name, 
     { summary: "Removed tag '"+ tag_name +"'" },
@@ -119,7 +119,7 @@ Situation.prototype.untag = function untagSituation(tag_name, callback){
 
 Situation.prototype.mark = function markSituation(mark_name, callback){
   var self = this;
-  self.set(
+  self._set(
     'marked', 
     mark_name, 
     (new Date()).getTime(), 
@@ -131,7 +131,7 @@ Situation.prototype.mark = function markSituation(mark_name, callback){
 
 Situation.prototype.unmark = function unmarkSituation(mark_name, callback){
   var self = this;
-  self.unset(
+  self._unset(
     'marked', 
     mark_name, 
     { summary: "Removed mark '"+ mark_name.replace('_',' ') +"'" },
