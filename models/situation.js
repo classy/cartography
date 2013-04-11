@@ -74,7 +74,7 @@ Situation.prototype.create = function createSituation(callback){
 }
 
 
-Situation.prototype.summerize = function summerizeSituation(callback){
+Situation.prototype.summarize = function summarizeSituation(callback){
   var self = this;
 
   var doc = new Doc(self.id);

@@ -75,7 +75,7 @@ Relationship.prototype.validate = function validateRelationship(callback){
 }
 
 
-Relationship.prototype.summerize = function summerizeRelationship(callback){
+Relationship.prototype.summarize = function summarizeRelationship(callback){
   var self = this;
 
   self.read(function(read_err, rel_body){
@@ -120,8 +120,8 @@ function updateSearchIndexForRelationship(callback){
   var source = null;
   var callback = callback || function(){};
 
-  self.summerize(function(summerization_error, rel_summary){
-    if (summerization_error){ return callback(summerization_error, null) }
+  self.summarize(function(summarization_error, rel_summary){
+    if (summarization_error){ return callback(summarization_error, null) }
     Doc.prototype.updateSearchIndex.call(self, rel_summary, callback);
   });
 }
