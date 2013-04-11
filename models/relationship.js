@@ -4,7 +4,6 @@ var design = require('./db/designs/relationships');
 
 var Doc = require('./doc');
 var RevisableDoc = require('./revisable');
-var Situation = require('./situation');
 
 
 
@@ -83,8 +82,8 @@ function updateSearchIndexForRelationship(callback){
   self.read(function(read_err, rel_body){
     if (read_err){ return callback(read_err, null) }
 
-    var cause = new Situation(rel_body.cause._id);
-    var effect = new Situation(rel_body.effect._id);
+    var cause = new RevisableDoc(rel_body.cause._id);
+    var effect = new RevisableDoc(rel_body.effect._id);
 
     async.parallel([
       function(parallel_cb){
