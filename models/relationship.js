@@ -129,5 +129,37 @@ function updateSearchIndexForRelationship(callback){
 Relationship.prototype.updateSearchIndex = updateSearchIndexForRelationship;
 
 
+function changeRelationshipDescription(description, callback){
+  return this._change('description', description, {
+    summary: "Changed description"
+  }, callback);
+}
+
+Relationship.prototype.description = changeRelationshipDescription;
+
+
+Relationship.prototype.mark = function markRelationship(mark_name, callback){
+  var self = this;
+  self._set(
+    'marked', 
+    mark_name, 
+    (new Date()).getTime(), 
+    { summary: "Marked '"+ mark_name.replace('_',' ') +"'" },
+    callback
+  );
+}
+
+
+Relationship.prototype.unmark = function unmarkRelationship(mark_name, callback){
+  var self = this;
+  self._unset(
+    'marked', 
+    mark_name, 
+    { summary: "Removed mark '"+ mark_name.replace('_',' ') +"'" },
+    callback
+  );
+}
+
+
 
 module.exports = Relationship;
