@@ -87,6 +87,27 @@ Situation.prototype.unmark = function unmarkSituation(mark_name, callback){
 }
 
 
+Situation.prototype.relationships = function listSituationRelationships(
+  callback
+){
+  var self = this;
+  var search_client = search.client();
+
+  search_client.search({
+    type: "relationship",
+    sort: [
+      { creation_date: "desc" }
+    ],
+    filter: {
+      or: [
+        { term: { "cause._id": self.id } },
+        { term: { "effect._id": self.id } }
+      ]
+    }
+  }, callback);
+}
+
+
 Situation.prototype.causes = function listSituationCauses(callback){
   var self = this;
   var search_client = search.client();
