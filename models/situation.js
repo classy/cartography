@@ -1,5 +1,6 @@
 var search = require('../search');
 var RevisableDoc = require('./revisable');
+var Relationship = require('./relationship');
 
 var design = require('./db/designs/situations');
 
@@ -10,12 +11,37 @@ var Situation = function Situation(id){
   this.type = 'situation';
   var self = this;
 
-  this.on('change', function(change_result){
+  self.on('change', function(field, change_result){
     self.updateSearchIndex();
+
+    if (field.name == 'title'){
+      self.relationships(function(search_error, search_result){
+        // TODO: this really should report the problem or something if there is
+        // an error conducting the search.
+        if (search_error){ return }
+
+        search_result.hits.forEach(function(hit){
+          var relationship = new Relationship(hit._id);
+          relationship.updateSearchIndex();
+        });
+      });
+    }
   });
 
-  this.on('delete', function(deletion_result){
+  self.on('delete', function(deletion_result){
     self.deleteFromSearchIndex();
+
+    // delete relationships too
+    self.relationships(function(search_error, search_result){
+      // TODO: this really should report the problem or something if there is
+      // an error conducting the search.
+      if (search_error){ return }
+
+      search_result.hits.forEach(function(hit){
+        var relaitonship = new Relationship(hit._id);
+        relationship.delete();
+      });
+    });
   });
 }
 
