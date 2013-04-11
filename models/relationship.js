@@ -42,7 +42,7 @@ Relationship.prototype.validate = function validateRelationship(callback){
   var cause = new Doc(self.tmp.doc_body.cause._id);
   var effect = new Doc(self.tmp.doc_body.effect._id);
 
-  function existanceVerifier(doc_instance, relation){
+  function existenceVerifier(doc_instance, relation){
     return function(async_callback){
       doc_instance.read(function(read_err, related_doc_body){
         if (read_err){ return async_callback(read_err, null) }
@@ -64,8 +64,8 @@ Relationship.prototype.validate = function validateRelationship(callback){
   }
 
   async.parallel([
-    existanceVerifier(cause, 'cause'),
-    existanceVerifier(effect, 'effect')
+    existenceVerifier(cause, 'cause'),
+    existenceVerifier(effect, 'effect')
   ], function(async_error, async_results){
     if (async_error){ return callback(async_error, null) }
 
