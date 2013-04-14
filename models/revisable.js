@@ -192,7 +192,7 @@ RevisableDoc.prototype._add = function addToRevisableDocField(
 
       value.push(element);
 
-      return self.change(field_name, value, additional_properties, callback);
+      return self._change(field_name, value, additional_properties, callback);
     }
   );
 }
@@ -242,7 +242,7 @@ RevisableDoc.prototype._remove = function removeFromRevisableDocField(
       value.splice(element_index, 1);
       value = value == [] ? undefined : value;
 
-      return self.change(field_name, value, additional_properties, callback);
+      return self._change(field_name, value, additional_properties, callback);
     }
   );
 }
@@ -283,7 +283,7 @@ RevisableDoc.prototype._set = function setInRevisableDoc(
 
       field_value[key] = value;
 
-      self.change(field_name, field_value, additional_properties, callback);
+      self._change(field_name, field_value, additional_properties, callback);
     }
   );
 }
@@ -332,7 +332,7 @@ RevisableDoc.prototype._unset = function unsetInRevisableDoc(
       delete field_value[key];
       field_value = field_value == {} ? undefined : field_value;
 
-      self.change(field_name, field_value, additional_properties, callback);
+      self._change(field_name, field_value, additional_properties, callback);
     }
   );
 };
