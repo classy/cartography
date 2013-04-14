@@ -4,6 +4,7 @@ var design = require('./db/designs/immutables');
 
 
 var ImmutableDoc = function ImmutableDoc(id){
+  if (!(this instanceof ImmutableDoc)) return new ImmutableDoc(id);
   if (id) { this.id = id; }
   this.immutable = true;
 }

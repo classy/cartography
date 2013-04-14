@@ -9,6 +9,7 @@ var RevisableDoc = require('./revisable');
 
 
 var Relationship = function Relationship(id){
+  if (!(this instanceof Relationship)) return new Relationship(id);
   if (id) { this.id = id; }
   this.type = 'relationship';
 

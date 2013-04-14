@@ -9,6 +9,7 @@ var design = require('./db/designs/situations');
 
 
 var Situation = function Situation(id){
+  if (!(this instanceof Situation)) return new Situation(id);
   if (id) { this.id = id; }
   this.type = 'situation';
   var self = this;

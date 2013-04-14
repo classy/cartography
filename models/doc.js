@@ -21,6 +21,7 @@ function getHeaders(id, callback){
 
 
 var Doc = function Doc(id){
+  if (!(this instanceof Doc)) return new Doc(id);
   if (id) { this.id = id }
   this.tmp = {};
 }

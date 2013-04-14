@@ -12,6 +12,7 @@ var Change = require('./change');
 
 
 function RevisableDoc(id){
+  if (!(this instanceof RevisableDoc)) return new RevisableDoc(id);
   if(id) this.id = id;
   this.revisable = true;
 }
