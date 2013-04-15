@@ -1,10 +1,12 @@
 var _ = require('lodash');
+var async = require('async');
 var search = require('../search');
 var Doc = require('./doc');
 var RevisableDoc = require('./revisable');
 var Relationship = require('./relationship');
 
 var design = require('./db/designs/situations');
+var db = require('./db').db;
 
 
 
@@ -171,6 +173,51 @@ Situation.prototype.unmark = function unmarkSituation(mark_name, callback){
     mark_name, 
     { summary: "Removed mark '"+ mark_name.replace('_',' ') +"'" },
     callback
+  );
+}
+
+
+Situation.prototype.delete = function deleteSituation(callback){
+  var self = this;
+
+  var view_options = {
+    key: self.id
+  }
+
+  db().view(
+    'relationships', 
+    'by_cause_or_effect', 
+    view_options, 
+    function(view_error, view_result){
+      if (view_error){ return callback(view_error, null) }
+      if (!view_result.rows.length){
+        return RevisableDoc.prototype.delete.call(this, callback);
+      }
+
+      var relationship_deletion_operations = view_result.rows.map(
+        function(row){
+          var relationship = new Relationship(row.id);
+          return function(parallel_callback){
+            relationship.delete(parallel_callback);
+          }
+        }
+      );
+
+      return async.parallel(
+        relationship_deletion_operations, 
+        function(
+          relationship_deletion_error, 
+          relationship_deletion_result
+        ){
+          if (relationship_deletion_error){ return callback(
+            relationship_deletion_error,
+            null
+          )}
+
+          return RevisableDoc.prototype.delete.call(self, callback);
+        }
+      );
+    }
   );
 }
 
