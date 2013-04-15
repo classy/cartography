@@ -15,43 +15,6 @@ var Situation = function Situation(id){
   if (id) { this.id = id; }
   this.type = 'situation';
   var self = this;
-
-  self.on('change', function(field, change_result){
-    self.updateSearchIndex();
-
-    if (
-      field.name == 'title' ||
-      field.name == 'location' ||
-      field.name == 'period'
-    ){
-      self.relationships(function(search_error, search_result){
-        // TODO: this really should report the problem or something if there is
-        // an error conducting the search.
-        if (search_error){ return }
-
-        search_result.hits.forEach(function(hit){
-          var relationship = new Relationship(hit._id);
-          relationship.updateSearchIndex();
-        });
-      });
-    }
-  });
-
-  self.on('delete', function(deletion_result){
-    self.deleteFromSearchIndex();
-
-    // delete relationships too
-    self.relationships(function(search_error, search_result){
-      // TODO: this really should report the problem or something if there is
-      // an error conducting the search.
-      if (search_error){ return }
-
-      search_result.hits.forEach(function(hit){
-        var relaitonship = new Relationship(hit._id);
-        relationship.delete();
-      });
-    });
-  });
 }
 
 

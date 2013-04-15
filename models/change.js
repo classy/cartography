@@ -8,14 +8,6 @@ var Change = function Change(id){
   if (id) { this.id = id; }
   this.type = 'change';
   var self = this;
-
-  this.on('create', function(creation_result){
-    self.updateSearchIndex();
-  });
-
-  this.on('delete', function(deletion_result){
-    self.deleteFromSearchIndex();
-  });
 }
 
 

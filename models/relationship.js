@@ -14,18 +14,6 @@ var Relationship = function Relationship(id){
   this.type = 'relationship';
 
   var self = this;
-
-  this.on('create', function(){
-    self.updateSearchIndex();
-  });
-
-  this.on('change', function(change_result){
-    self.updateSearchIndex();
-  });
-
-  this.on('delete', function(deletion_result){
-    self.deleteFromSearchIndex();
-  });
 }
 
 
