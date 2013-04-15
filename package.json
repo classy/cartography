@@ -1,0 +1,6 @@
+{
+  "name": "cartography",
+  "description": "Situations linked by Cause and Effect",
+  "author": "Jeff Marshall <jeff@classy.co>",
+  "engine": "node >= 0.10."
+}
