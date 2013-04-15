@@ -1,4 +1,6 @@
 module.exports = {
   client: require('./client'),
-  sync: require('./sync')
+  sync: function(){
+    require('./sync')
+  }
 }
