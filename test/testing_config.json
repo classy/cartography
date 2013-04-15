@@ -1,6 +1,0 @@
-{
-  "couchdb": {
-    "host": "http://causemap.org:5984",
-    "database": "cartography"
-  }
-}
