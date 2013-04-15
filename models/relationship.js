@@ -66,6 +66,24 @@ Relationship.prototype.validate = function validateRelationship(callback){
   }
 
   async.parallel([
+    function(async_callback){
+      db().view('relationships', 'by_cause_and_effect', {
+        key: [cause.id, effect.id]
+      }, function(view_error, view_result){
+        if (view_error){ return async_callback(view_error, null) }
+        if (view_result.rows.length){
+          var error = {
+            error: "forbidden",
+            reason: "This relationship already exists.",
+            relationship: view_result.rows[0].id
+          }
+
+          return callback(error, null)
+        }
+
+        return callback(null, { does_not_exist_yet: true });
+      })
+    },
     existenceVerifier(cause, 'cause'),
     existenceVerifier(effect, 'effect')
   ], function(async_error, async_results){
