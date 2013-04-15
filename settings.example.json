@@ -2,5 +2,15 @@
   "couchdb": {
     "host": "http://localhost:5984",
     "database": "cartography"
+  },
+  "elasticsearch": {
+    "host": "localhost",
+    "options": {
+      "port": 9200
+    },
+    "indexes": {
+      "main": "cartography",
+      "suggestion": "cartography_suggestions"
+    }
   }
 }
