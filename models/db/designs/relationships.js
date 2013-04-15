@@ -45,5 +45,22 @@ module.exports = {
         typeof new_doc.effect._id == 'string',
         "'effect._id' must be a string.");
     }
+  },
+  views: {
+    by_cause_or_effect: {
+      map: function(doc){
+        if (doc.type == 'relationship'){
+          emit(doc.cause._id, null);
+          emit(doc.effect._id, null);
+        }
+      }
+    },
+    by_cause_and_effect: {
+      map: function(doc){
+        if (doc.type == 'relationship'){
+          emit([doc.cause._id, doc.effect._id], null);
+        }
+      }
+    }
   }
 }
