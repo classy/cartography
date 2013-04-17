@@ -154,7 +154,7 @@ Situation.prototype.delete = function deleteSituation(callback){
     function(view_error, view_result){
       if (view_error){ return callback(view_error, null) }
       if (!view_result.rows.length){
-        return RevisableDoc.prototype.delete.call(this, callback);
+        return RevisableDoc.prototype.delete.call(self, callback);
       }
 
       var relationship_deletion_operations = view_result.rows.map(
