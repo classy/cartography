@@ -7,7 +7,6 @@ var Change = function Change(id){
   if (!(this instanceof Change)) return new Change(id);
   if (id) { this.id = id; }
   this.type = 'change';
-  var self = this;
 }
 
 
