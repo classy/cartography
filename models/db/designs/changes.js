@@ -132,6 +132,23 @@ module.exports = {
               "A situation's 'marked' keys must return a number");
           }
         }
+
+        if (field_name == 'alias'){
+          function isSlug(str){
+            return str.match(/^[a-z0-9-]+$/) ? true : false
+          }
+
+          required(
+            typeof value == 'string',
+            "A situation's 'alias' must be a string.");
+
+          required(
+            isSlug(value),
+            [
+              "A situation's 'alias' may contain only",
+              "lowercase letters, numbers, dashes and underscores."
+            ].join(' '));
+        }
       }
 
       if (changed.doc.type == 'relationship'){

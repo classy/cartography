@@ -4,6 +4,7 @@ var EventEmitter = require('events').EventEmitter;
 var db = require('./db').db;
 var nano = require('./db').nano;
 var search = require('../search');
+var alias_design = require('./db/designs/aliases');
 
 
 
@@ -66,10 +67,30 @@ Doc.prototype.create = function createDoc(doc_body, callback){
 }
 
 
+Doc.prototype.realId = function realIdForDoc(callback){
+  var self = this;
+
+  db().get(self.id, function(get_err, doc){
+    if (get_err) { return callback(get_err, null) }
+    if (doc.type == 'alias'){
+      self.id = doc.target.doc._id;
+      return self.realId(callback);
+    }
+
+    return callback(null, doc._id);
+  });
+};
+
+
 Doc.prototype.read = function readDoc(callback){
   var self = this;
   db().get(self.id, function(get_err, doc){
     if (get_err) { return callback(get_err, null) }
+    if (doc.type == 'alias'){
+      self.id = doc.target.doc._id;
+      return self.read(callback);
+    }
+
     self.emit('read', doc);
     return callback(null, doc);
   });
@@ -214,6 +235,147 @@ Doc.prototype.delete = function deleteDoc(callback){
         self.emit('delete', destroy_result);
         return callback(null, destroy_result);
       });
+  });
+}
+
+
+function Alias(id){
+  if (!(this instanceof Alias)) return new Alias(id);
+  if (id) { this.id = id }
+  this.type = 'alias';
+}
+
+
+Alias.prototype = new Doc();
+
+
+Alias.prototype.create = function createAlias(doc_body, callback){
+  doc_body = doc_body || {};
+  doc_body.creation_date = (new Date()).getTime();
+  
+  Doc.prototype.create.call(this, doc_body, callback);
+}
+
+
+Alias.prototype.validate = function validateAlias(callback){
+  var self = this;
+
+  try {
+    alias_design.validate_doc_update(self.tmp.doc_body, self.tmp.old_doc_body);
+  } catch (validation_error){
+    return callback(validation_error, null);
+  }
+
+  var target_doc_id = self.tmp.doc_body.target.doc._id;
+
+  db().get(target_doc_id, function(get_error, target_doc_body){
+    if (get_error){
+      var error = {error: 'forbidden', reason: "Target doc doesn't exist."}
+      return callback(error, null);
+    }
+
+    if (target_doc_body.type == 'alias'){
+      var error = {
+        error: "forbidden",
+        reason: "Target doc must not be an alias itself."
+      }
+
+      return callback(error, null);
+    }
+
+    return callback(null, true)
+  });
+}
+
+
+Alias.prototype.read = function readAlias(callback){
+  var self = this;
+  db().get(self.id, function(get_error, alias_body){
+    if (get_error){ return callback(get_error, null) }
+    callback(null, alias_body);
+    return self.emit('read', alias_body);
+  });
+}
+
+
+Alias.prototype._alias = function aliasAlias(callback){
+  var error = {
+    error: "forbidden",
+    message: "Alias docs cannot be aliased."
+  }
+
+  return callback(error, null);
+}
+
+
+Alias.prototype._unalias = function unaliasAlias(callback){
+  var error = {
+    error: "forbidden",
+    message: "Alias docs cannot be unaliased."
+  }
+
+  return callback(error, null);
+}
+
+
+Doc.prototype._alias = function aliasDoc(alias_name, callback){
+  var self = this;
+
+  Doc.prototype.read.call(self, function(read_error){
+    if (read_error){ return callback(read_error, null) }
+
+    var new_alias = new Alias();
+    new_alias.create({
+      _id: alias_name,
+      target: {
+        doc: { _id: self.id }
+      }
+    }, callback);
+  });
+}
+
+
+Doc.prototype._unalias = function unaliasDoc(alias_name, callback){
+  var self = this;
+
+  self.aliases(function(view_error, aliases){
+    if (view_error){ return callback(view_error, null) }
+    if (aliases.indexOf(alias_name) == -1){
+      var error = {
+        error: "not_aliased",
+        message: "This doc is not aliased with '"+ alias_name +"'."
+      }
+
+      return callback(error, null);
+    }
+
+    var alias = new Alias(alias_name);
+    alias.delete(callback);
+  });
+}
+
+
+Doc.prototype._aliases = function aliasesForDoc(callback){
+  var self = this;
+
+  self.read(function(read_error){
+    if (read_error){ return callback(read_error, null) }
+
+    var view_options = {
+      key: self.id
+    }
+
+    db().view('aliases', 'by_target_id', view_options, function(
+      view_error, 
+      view_result
+    ){
+      if (view_error){ return callback(view_error, null) }
+      var aliases = view_result.rows.map(function(row){
+        return row.id;
+      });
+
+      return callback(null, aliases);
+    });
   });
 }
 

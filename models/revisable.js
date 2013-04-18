@@ -114,38 +114,44 @@ RevisableDoc.prototype._change = function changeRevisableDoc(
 RevisableDoc.prototype.delete = function deleteRevisableDoc(callback){
   var self = this;
 
-  var view_options = {
-    startkey: [self.id],
-    endkey: [self.id, {}],
-    include_docs: true,
-    reduce: false
-  }
+  self.realId(function(real_id_error, id){
+    if (real_id_error){
+      return callback(real_id_error, null);
+    }
 
-  db().view(
-    'revisables', 
-    'changes_by_changed', 
-    view_options, 
-    function(view_error, view_result){
-      if (view_error){ return callback(view_error, null) }
-      
-      var docs = view_result.rows.map(function(row){
-        var doc = _.clone(row.doc);
-        doc._deleted = true;
-        return doc;
-      });
+    var view_options = {
+      startkey: [self.id],
+      endkey: [self.id, {}],
+      include_docs: true,
+      reduce: false
+    }
 
-      db().bulk({ docs: docs }, function(bulk_error, bulk_delete){
-        if (bulk_error){ return callback(bulk_error, null) }
-
-        docs.map(function(doc_body){
-          var change = new Change(doc_body._id);
-          change.emit('delete');
+    db().view(
+      'revisables', 
+      'changes_by_changed', 
+      view_options, 
+      function(view_error, view_result){
+        if (view_error){ return callback(view_error, null) }
+        
+        var docs = view_result.rows.map(function(row){
+          var doc = _.clone(row.doc);
+          doc._deleted = true;
+          return doc;
         });
 
-        Doc.prototype.delete.call(self, callback)
-      });
-    }
-  );
+        db().bulk({ docs: docs }, function(bulk_error, bulk_delete){
+          if (bulk_error){ return callback(bulk_error, null) }
+
+          docs.map(function(doc_body){
+            var change = new Change(doc_body._id);
+            change.emit('delete');
+          });
+
+          Doc.prototype.delete.call(self, callback)
+        });
+      }
+    );
+  });
 }
 
 
@@ -406,25 +412,29 @@ RevisableDoc.prototype.readField = function readRevisableDocField(
 ){
   var self = this;
 
-  var field_view_options = {
-    endkey: [self.id, field_name],
-    startkey: [self.id, field_name, {}],
-    descending: true,
-    reduce: false,
-    limit: 1
-  }
+  self.realId(function(real_id_error){
+    if (real_id_error){ return callback(real_id_error, null) }
 
-  return db().view(
-    'revisables', 
-    'changes_by_changed', 
-    field_view_options, 
-    function(view_err, view_result){
-      if (view_err){ return callback(view_err, null) }
-      if (!view_result.rows.length){ return callback(null, undefined) }
-
-      return callback(null, view_result.rows[0].value.to);
+    var field_view_options = {
+      endkey: [self.id, field_name],
+      startkey: [self.id, field_name, {}],
+      descending: true,
+      reduce: false,
+      limit: 1
     }
-  );
+
+    return db().view(
+      'revisables', 
+      'changes_by_changed', 
+      field_view_options, 
+      function(view_err, view_result){
+        if (view_err){ return callback(view_err, null) }
+        if (!view_result.rows.length){ return callback(null, undefined) }
+
+        return callback(null, view_result.rows[0].value.to);
+      }
+    );
+  });
 }
 
 
@@ -456,15 +466,19 @@ RevisableDoc.prototype.changes = function listRevisableDocChanges(callback){
   var self = this;
   var search_client = search.client();
 
-  search_client.search({
-    type: "change",
-    sort: [
-      { creation_date: "desc" }
-    ],
-    filter: {
-      term: { "changed.doc._id": self.id }
-    }
-  }, callback);
+  self.realId(function(real_id_error){
+    if (real_id_error){ return callback(real_id_error, null) }
+
+    search_client.search({
+      type: "change",
+      sort: [
+        { creation_date: "desc" }
+      ],
+      filter: {
+        term: { "changed.doc._id": self.id }
+      }
+    }, callback);
+  });
 }
 
 
