@@ -64,10 +64,7 @@ Situation.prototype.summarize = function summarizeSituation(callback){
 
 Situation.prototype.alias = function changeSituationAlias(alias, callback){
   var self = this;
-  return self._alias(alias, function(alias_error, alias_result){
-    if (alias_error){ return callback(alias_error, null); }
-    return self._change('alias', alias, callback);
-  });
+  return self._change('alias', alias, callback);
 }
 
 
@@ -157,45 +154,41 @@ Situation.prototype.delete = function deleteSituation(callback){
     key: self.id
   }
 
-  self.realId(function(id_error){
-    if (id_error){ return callback(id_error, null) }
+  db().view(
+    'relationships', 
+    'by_cause_or_effect', 
+    view_options, 
+    function(view_error, view_result){
+      if (view_error){ return callback(view_error, null) }
+      if (!view_result.rows.length){
+        return RevisableDoc.prototype.delete.call(self, callback);
+      }
 
-    db().view(
-      'relationships', 
-      'by_cause_or_effect', 
-      view_options, 
-      function(view_error, view_result){
-        if (view_error){ return callback(view_error, null) }
-        if (!view_result.rows.length){
+      var relationship_deletion_operations = view_result.rows.map(
+        function(row){
+          var relationship = new Relationship(row.id);
+          return function(parallel_callback){
+            relationship.delete(parallel_callback);
+          }
+        }
+      );
+
+      return async.parallel(
+        relationship_deletion_operations, 
+        function(
+          relationship_deletion_error, 
+          relationship_deletion_result
+        ){
+          if (relationship_deletion_error){ return callback(
+            relationship_deletion_error,
+            null
+          )}
+
           return RevisableDoc.prototype.delete.call(self, callback);
         }
-
-        var relationship_deletion_operations = view_result.rows.map(
-          function(row){
-            var relationship = new Relationship(row.id);
-            return function(parallel_callback){
-              relationship.delete(parallel_callback);
-            }
-          }
-        );
-
-        return async.parallel(
-          relationship_deletion_operations, 
-          function(
-            relationship_deletion_error, 
-            relationship_deletion_result
-          ){
-            if (relationship_deletion_error){ return callback(
-              relationship_deletion_error,
-              null
-            )}
-
-            return RevisableDoc.prototype.delete.call(self, callback);
-          }
-        );
-      }
-    );
-  });
+      );
+    }
+  );
 }
 
 
@@ -205,23 +198,19 @@ Situation.prototype.relationships = function listSituationRelationships(
   var self = this;
   var search_client = search.client();
 
-  self.realId(function(id_error){
-    if (id_error){ return callback(id_error, null) }
-
-    search_client.search({
-      type: "relationship",
-      index: es_config.indexes.main,
-      sort: [
-        { creation_date: "desc" }
-      ],
-      filter: {
-        or: [
-          { term: { "cause._id": self.id } },
-          { term: { "effect._id": self.id } }
-        ]
-      }
-    }, callback);
-  });
+  search_client.search({
+    type: "relationship",
+    index: es_config.indexes.main,
+    sort: [
+      { creation_date: "desc" }
+    ],
+    filter: {
+      or: [
+        { term: { "cause._id": self.id } },
+        { term: { "effect._id": self.id } }
+      ]
+    }
+  }, callback);
 }
 
 
@@ -229,20 +218,16 @@ Situation.prototype.causes = function listSituationCauses(callback){
   var self = this;
   var search_client = search.client();
 
-  self.realId(function(id_error){
-    if (id_error){ return callback(id_error, null) }
-
-    search_client.search({
-      type: "relationship",
-      index: es_config.indexes.main,
-      sort: [
-        { creation_date: "desc" }
-      ],
-      filter: {
-        term: { "effect._id": self.id }
-      }
-    }, callback);
-  });
+  search_client.search({
+    type: "relationship",
+    index: es_config.indexes.main,
+    sort: [
+      { creation_date: "desc" }
+    ],
+    filter: {
+      term: { "effect._id": self.id }
+    }
+  }, callback);
 }
 
 
@@ -250,20 +235,16 @@ Situation.prototype.effects = function listSituationEffects(callback){
   var self = this;
   var search_client = search.client();
 
-  self.realId(function(id_error){
-    if (id_error){ return callback(id_error, null) }
-
-    search_client.search({
-      type: "relationship",
-      index: es_config.indexes.main,
-      sort: [
-        { creation_date: "desc" }
-      ],
-      filter: {
-        term: { "cause._id": self.id }
-      }
-    }, callback);
-  });
+  search_client.search({
+    type: "relationship",
+    index: es_config.indexes.main,
+    sort: [
+      { creation_date: "desc" }
+    ],
+    filter: {
+      term: { "cause._id": self.id }
+    }
+  }, callback);
 }
 
 
