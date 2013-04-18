@@ -4,10 +4,14 @@ var async = require('async');
 var db = require('./db').db;
 
 var search = require('../search');
+var config = require('../config');
 var design = require('./db/designs/revisables');
 var Doc = require('./doc');
 var ImmutableDoc = require('./immutable');
 var Change = require('./change');
+
+
+var es_config = config.get('elasticsearch');
 
 
 
@@ -471,6 +475,7 @@ RevisableDoc.prototype.changes = function listRevisableDocChanges(callback){
 
     search_client.search({
       type: "change",
+      index: es_config.indexes.main,
       sort: [
         { creation_date: "desc" }
       ],

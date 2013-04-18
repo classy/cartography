@@ -1,5 +1,6 @@
 var _ = require('lodash');
 var async = require('async');
+var config = require('../config');
 var search = require('../search');
 var Doc = require('./doc');
 var RevisableDoc = require('./revisable');
@@ -7,6 +8,7 @@ var Relationship = require('./relationship');
 
 var design = require('./db/designs/situations');
 var db = require('./db').db;
+var es_config = config.get('elasticsearch');
 
 
 
@@ -199,6 +201,7 @@ Situation.prototype.relationships = function listSituationRelationships(
 
     search_client.search({
       type: "relationship",
+      index: es_config.indexes.main,
       sort: [
         { creation_date: "desc" }
       ],
@@ -222,6 +225,7 @@ Situation.prototype.causes = function listSituationCauses(callback){
 
     search_client.search({
       type: "relationship",
+      index: es_config.indexes.main,
       sort: [
         { creation_date: "desc" }
       ],
@@ -242,6 +246,7 @@ Situation.prototype.effects = function listSituationEffects(callback){
 
     search_client.search({
       type: "relationship",
+      index: es_config.indexes.main,
       sort: [
         { creation_date: "desc" }
       ],
