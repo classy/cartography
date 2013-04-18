@@ -48,7 +48,11 @@ module.exports = function updateOperationsForChange(
       if (ops_error){ return callback(ops_error, null) }
       update_ops.push(operations);
       
-      if (['title', 'period', 'location'].indexOf(changed.field.name) > -1){
+      if (
+        ['title', 'period', 'location', 'alias'].indexOf(
+          changed.field.name
+        ) > -1
+      ){
         var situation = new Situation(changed.doc._id);
         situation.relationships(function(search_error, search_result){
           if (search_error){ return callback(search_error, null) }
