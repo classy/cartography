@@ -105,9 +105,9 @@ Situation.prototype.alias = function changeSituationAlias(alias, callback){
 
     var situation = new Situation(id);
 
-    situation.read(function(read_error, situation_body){
+    situation.readField('alias', function(read_error, situation_alias){
       if (read_error){ return callback(read_error, null); }
-      if (situation_body.alias != alias){
+      if (situation_alias != alias){
         return self._change('alias', alias, callback);
       }
 
