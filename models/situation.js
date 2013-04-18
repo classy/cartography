@@ -246,15 +246,32 @@ Situation.prototype.delete = function deleteSituation(callback){
 }
 
 
-Situation.prototype.relationships = function listSituationRelationships(
-  callback
-){
+Situation.prototype.relationships = function listSituationRelationships(){
+  
+  var callback = function(){};
+  var options = {};
+
+  switch(arguments.length){
+    case 1 :
+      var callback = arguments[0];
+      break;
+
+    case 2 :
+      var options = arguments[0];
+      var callback = arguments[1];
+      break;
+  }
+
+  var self = this;
+  var search_client = search.client();
+
   var self = this;
   var search_client = search.client();
 
   search_client.search({
     type: "relationship",
     index: es_config.indexes.main,
+    size: options.limit,
     sort: [
       { strength: "desc" },
       { creation_date: "desc" }
@@ -269,13 +286,29 @@ Situation.prototype.relationships = function listSituationRelationships(
 }
 
 
-Situation.prototype.causes = function listSituationCauses(callback){
+Situation.prototype.causes = function listSituationCauses(){
+  
+  var callback = function(){};
+  var options = {};
+
+  switch(arguments.length){
+    case 1 :
+      var callback = arguments[0];
+      break;
+
+    case 2 :
+      var options = arguments[0];
+      var callback = arguments[1];
+      break;
+  }
+
   var self = this;
   var search_client = search.client();
 
   search_client.search({
     type: "relationship",
     index: es_config.indexes.main,
+    size: options.limit,
     sort: [
       { strength: "desc" },
       { creation_date: "desc" }
@@ -287,13 +320,29 @@ Situation.prototype.causes = function listSituationCauses(callback){
 }
 
 
-Situation.prototype.effects = function listSituationEffects(callback){
+Situation.prototype.effects = function listSituationEffects(){
+  
+  var callback = function(){};
+  var options = {};
+
+  switch(arguments.length){
+    case 1 :
+      var callback = arguments[0];
+      break;
+
+    case 2 :
+      var options = arguments[0];
+      var callback = arguments[1];
+      break;
+  }
+
   var self = this;
   var search_client = search.client();
 
   search_client.search({
     type: "relationship",
     index: es_config.indexes.main,
+    size: options.limit,
     sort: [
       { strength: "desc" },
       { creation_date: "desc" }
