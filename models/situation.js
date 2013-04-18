@@ -78,7 +78,7 @@ Situation.prototype.summarize = function summarizeSituation(callback){
   doc.read(function(read_error, doc_body){
     if (read_error){ return callback(read_error, null) }
 
-    self.readFields(['title', 'location', 'period'], function(
+    self.readFields(['title', 'location', 'period', 'alias'], function(
       read_fields_error, 
       fields
     ){

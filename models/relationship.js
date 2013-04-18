@@ -96,7 +96,8 @@ Relationship.prototype.summarize = function summarizeRelationship(callback){
         cause.readFields([
           'title',
           'location',
-          'period'
+          'period',
+          'alias'
         ], function(read_field_err, fields){
           if (read_field_err){ return parallel_cb(read_field_err, null) }
           rel_body.cause = _.extend(rel_body.cause, fields);
@@ -107,7 +108,8 @@ Relationship.prototype.summarize = function summarizeRelationship(callback){
         effect.readFields([
           'title',
           'location',
-          'period'
+          'period',
+          'alias'
         ], function(read_field_err, fields){
           if (read_field_err){ return parallel_cb(read_field_err, null) }
           rel_body.effect = _.extend(rel_body.effect, fields);
