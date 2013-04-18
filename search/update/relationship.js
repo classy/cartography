@@ -19,6 +19,8 @@ module.exports = function updateOperationsForRelationship(
       return callback(summarization_error, null);
     }
 
+    relationship_summary.strength = 0;
+
     var relationship_summary_without_description = _.clone(
       relationship_summary
     )

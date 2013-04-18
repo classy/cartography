@@ -256,6 +256,7 @@ Situation.prototype.relationships = function listSituationRelationships(
     type: "relationship",
     index: es_config.indexes.main,
     sort: [
+      { strength: "desc" },
       { creation_date: "desc" }
     ],
     filter: {
@@ -276,6 +277,7 @@ Situation.prototype.causes = function listSituationCauses(callback){
     type: "relationship",
     index: es_config.indexes.main,
     sort: [
+      { strength: "desc" },
       { creation_date: "desc" }
     ],
     filter: {
@@ -293,6 +295,7 @@ Situation.prototype.effects = function listSituationEffects(callback){
     type: "relationship",
     index: es_config.indexes.main,
     sort: [
+      { strength: "desc" },
       { creation_date: "desc" }
     ],
     filter: {
