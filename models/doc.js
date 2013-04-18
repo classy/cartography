@@ -224,6 +224,10 @@ Doc.prototype.delete = function deleteDoc(callback){
   var self = this;
 
   self.read(function(read_error, doc_body){
+    if (read_error){
+      return callback(read_error, null);
+    }
+
     db().destroy(
       doc_body._id, 
       doc_body._rev, 
