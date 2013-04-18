@@ -54,7 +54,7 @@ RevisableDoc.prototype.update = function updateRevisableDoc(
 ){
   var error = {
     error: "forbidden",
-    message: "Revisable docs cannot be updated. Use 'change' instead."
+    message: "Revisable docs cannot be updated. Use '_change' instead."
   }
 
   return callback(error, null);
