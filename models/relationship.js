@@ -124,20 +124,6 @@ Relationship.prototype.summarize = function summarizeRelationship(callback){
 }
 
 
-function updateSearchIndexForRelationship(callback){
-  var self = this;
-  var source = null;
-  var callback = callback || function(){};
-
-  self.summarize(function(summarization_error, rel_summary){
-    if (summarization_error){ return callback(summarization_error, null) }
-    Doc.prototype.updateSearchIndex.call(self, rel_summary, callback);
-  });
-}
-
-Relationship.prototype.updateSearchIndex = updateSearchIndexForRelationship;
-
-
 function changeRelationshipDescription(description, callback){
   return this._change('description', description, {
     summary: "Changed description"

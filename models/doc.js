@@ -76,60 +76,6 @@ Doc.prototype.read = function readDoc(callback){
 }
 
 
-Doc.prototype.updateSearchIndex = function updateSearchIndexForDoc(){
-  var self = this;
-  var source = null;
-  var callback = function(){};
-
-  function index(doc){
-    search.client().index(
-      'cartography',
-      self.type,
-      doc,
-      { id: self.id },
-      function(indexing_error, indexing_result){
-        if (indexing_error){ return callback(indexing_error, null) }
-
-        self.emit('updateSearchIndex', indexing_result);
-        return callback(null, indexing_result);
-      }
-    );
-  }
-
-  switch(arguments.length){
-    case 1: callback = arguments[0]; break;
-    case 2: callback = arguments[1]; source = arguments[0]; break;
-  }
-
-  if (source){
-    return index(source);
-  }
-
-  self.read(function(doc_read_err, doc_body){
-    if (doc_read_err){ return callback(doc_read_err, null) };
-    return index(doc_body);
-  });
-};
-
-
-Doc.prototype.deleteFromSearchIndex = function deleteDocFromSearchIndex(
-  callback
-){
-  var self = this;
-  callback = callback || function(){};
-
-  search.client().delete(
-    'cartography',
-    self.type,
-    self.id,
-    function(deletion_error, deletion_result){
-      if (deletion_error){ return callback(deletion_error, null) }
-      return callback(null, deletion_result);
-    }
-  );
-}
-
-
 Doc.prototype.exists = function(callback){
   if (!this.id){ return callback(null, false) }
   getHeaders(this.id, function(header_error, headers){
