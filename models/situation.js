@@ -19,6 +19,35 @@ var Situation = function Situation(id){
 }
 
 
+Situation.identify = function identifySituation(alias, callback){
+  var self = this;
+
+  var view_options = {
+    endkey: [alias],
+    startkey: [alias, {}],
+    descending: true,
+    limit: 1
+  }
+
+  db().view('situations', 'aliased', view_options, function(
+    view_error, 
+    view_result
+  ){
+    if (view_error){ return callback(view_error, null) }
+    if (!view_result.rows.length){
+      var error = {
+        error: "not_found",
+        message: "No situation has had that alias."
+      }
+
+      return callback(error, null);
+    }
+
+    return callback(null, view_result.rows[0].value);
+  });
+}
+
+
 Situation.prototype = new RevisableDoc();
 
 
@@ -64,7 +93,32 @@ Situation.prototype.summarize = function summarizeSituation(callback){
 
 Situation.prototype.alias = function changeSituationAlias(alias, callback){
   var self = this;
-  return self._change('alias', alias, callback);
+
+  Situation.identify(alias, function(id_error, id){
+    if (id_error){
+      if (id_error.error == 'not_found'){
+        return self._change('alias', alias, callback);
+      }
+
+      return callback(id_error, null);
+    }
+
+    var situation = new Situation(id);
+
+    situation.read(function(read_error, situation_body){
+      if (read_error){ return callback(read_error, null); }
+      if (situation_body.alias != alias){
+        return self._change('alias', alias, callback);
+      }
+
+      var error = {
+        error: "taken",
+        message: "Already being used by another situation."
+      }
+
+      return callback(error, null);
+    });
+  });
 }
 
 

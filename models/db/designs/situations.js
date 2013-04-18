@@ -21,5 +21,21 @@ module.exports = {
 
     if (type == "situation"){
     }
+  },
+  views: {
+    aliased: {
+      map: function(doc){
+        if (doc.type == 'change'){
+          var changed = doc.changed;
+
+          if (
+            changed.doc.type == 'situation' 
+            && changed.field.name == 'alias'
+          ){
+            emit([changed.field.to, doc.creation_date], changed.doc._id);
+          }
+        }
+      }
+    }
   }
 }
