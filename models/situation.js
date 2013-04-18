@@ -62,6 +62,15 @@ Situation.prototype.summarize = function summarizeSituation(callback){
 }
 
 
+Situation.prototype.alias = function changeSituationAlias(alias, callback){
+  var self = this;
+  return self._alias(alias, function(alias_error, alias_result){
+    if (alias_error){ return callback(alias_error, null); }
+    return self._change('alias', alias, callback);
+  });
+}
+
+
 Situation.prototype.title = function changeSituationTitle(title, callback){
   var self = this;
 
