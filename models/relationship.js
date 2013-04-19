@@ -17,6 +17,10 @@ var Relationship = function Relationship(id){
   var self = this;
 }
 
+module.exports = Relationship;
+var Situation = require('./situation');
+
+
 
 Relationship.prototype = new RevisableDoc();
 
@@ -250,4 +254,3 @@ Relationship.prototype.delete = function deleteRelationship(callback){
 
 
 
-module.exports = Relationship;
