@@ -456,13 +456,29 @@ RevisableDoc.prototype.readFields = function readRevisableDocFields(
 }
 
 
-RevisableDoc.prototype.changes = function listRevisableDocChanges(callback){
+RevisableDoc.prototype.changes = function listRevisableDocChanges(){
+  
+  var callback = function(){};
+  var options = {};
+
+  switch(arguments.length){
+    case 1 :
+      var callback = arguments[0];
+      break;
+
+    case 2 :
+      var options = arguments[0];
+      var callback = arguments[1];
+      break;
+  }
+
   var self = this;
   var search_client = search.client();
 
   search_client.search({
     type: "change",
     index: es_config.indexes.main,
+    size: options.limit,
     sort: [
       { creation_date: "desc" }
     ],
