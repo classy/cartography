@@ -4,7 +4,6 @@ var config = require('../config');
 var search = require('../search');
 var Doc = require('./doc');
 var RevisableDoc = require('./revisable');
-var Relationship = require('./relationship');
 
 var design = require('./db/designs/situations');
 var db = require('./db').db;
@@ -17,6 +16,9 @@ var Situation = function Situation(id){
   if (id) { this.id = id; }
   this.type = 'situation';
 }
+
+module.exports = Situation;
+var Relationship = require('./relationship');
 
 
 Situation.identify = function identifySituation(alias, callback){
@@ -430,4 +432,3 @@ Situation.prototype.similar = function listSimilarSituations(){
 
 
 
-module.exports = Situation
