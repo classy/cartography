@@ -93,8 +93,8 @@ Relationship.prototype.summarize = function summarizeRelationship(callback){
   self.read(function(read_err, rel_body){
     if (read_err){ return callback(read_err, null) }
 
-    var cause = new RevisableDoc(rel_body.cause._id);
-    var effect = new RevisableDoc(rel_body.effect._id);
+    var cause = new Situation(rel_body.cause._id);
+    var effect = new Situation(rel_body.effect._id);
 
     async.parallel([
       function(parallel_cb){
@@ -107,27 +107,23 @@ Relationship.prototype.summarize = function summarizeRelationship(callback){
         });
       },
       function(parallel_cb){
-        cause.readFields([
-          'title',
-          'location',
-          'period',
-          'alias'
-        ], function(read_field_err, fields){
-          if (read_field_err){ return parallel_cb(read_field_err, null) }
-          rel_body.cause = _.extend(rel_body.cause, fields);
-          parallel_cb(null, fields);
+        cause.summarize(function(summarization_error, cause_summary){
+          if (summarization_error){
+            return parallel_cb(summarization_error, null)
+          }
+
+          rel_body.cause = cause_summary;
+          parallel_cb(null, cause_summary);
         });
       },
       function(parallel_cb){
-        effect.readFields([
-          'title',
-          'location',
-          'period',
-          'alias'
-        ], function(read_field_err, fields){
-          if (read_field_err){ return parallel_cb(read_field_err, null) }
-          rel_body.effect = _.extend(rel_body.effect, fields);
-          parallel_cb(null, fields);
+        effect.summarize(function(summarization_error, effect_summary){
+          if (summarization_error){
+            return parallel_cb(summarization_error, null)
+          }
+
+          rel_body.effect = effect_summary;
+          parallel_cb(null, effect_summary);
         });
       }
     ], function(parallel_error, parallel_result){
