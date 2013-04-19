@@ -354,5 +354,80 @@ Situation.prototype.effects = function listSituationEffects(){
 }
 
 
+Situation.prototype.similar = function listSimilarSituations(){
+  
+  var callback = function(){};
+  var options = {};
+
+  switch(arguments.length){
+    case 1 :
+      var callback = arguments[0];
+      break;
+
+    case 2 :
+      var options = arguments[0];
+      var callback = arguments[1];
+      break;
+  }
+
+  var self = this;
+  var search_client = search.client();
+
+  self.relationships(function(search_error, search_result){
+    if (search_error){ return callback(search_error, null) }
+    
+    var ids_of_related_situations = _.uniq(
+      search_result.hits.map(
+        function(hit){
+          var cause_id = hit._source.cause._id;
+          var effect_id = hit._source.effect._id;
+
+          return cause_id == self.id ? effect_id : cause_id;
+        }
+      )
+    );
+
+    ids_of_related_situations.push(self.id);
+
+    self.readField('title', function(read_error, title){
+      if (read_error){ return callback(read_error, null) }
+
+      var more_like_this = {
+        fields: ['situation.title'],
+        like_text: title,
+        min_term_freq: 1,
+        min_doc_freq: 1
+      }
+
+      var filter = {
+        not: { 
+          ids: {
+            type: self.type,
+            values: ids_of_related_situations
+          }
+        }
+      }
+
+      search_client.search({
+        index: es_config.indexes.main,
+        type: self.type,
+        query: {
+          filtered: {
+            size: options.limit,
+            query: {
+              more_like_this: more_like_this
+            },
+            filter: filter
+          }
+        }
+      }, function(search_error, search_result){
+        if (search_error){ return callback(search_error, null) }
+        return callback(null, search_result);
+      });
+    });
+  });
+}
+
+
 
 module.exports = Situation
