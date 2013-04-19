@@ -43,6 +43,9 @@ async.series([
     law.title('National Assembly of Quebec Passes Bill 78', cb);
   },
   function(cb){
+    law.alias('national-assembly-of-quebec-passes-bill-78', cb);
+  },
+  function(cb){
     law.period('May 18th, 2012', cb);
   },
   function(cb){
@@ -67,6 +70,9 @@ async.series([
   },
   function(cb){
     casserole.title('Casserole Protests', cb);
+  },
+  function(cb){
+    casserole.alias('casserole-protests', cb);
   },
   function(cb){
     casserole.location('Montreal, QC', cb);
