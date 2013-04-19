@@ -425,9 +425,9 @@ Situation.prototype.similar = function listSimilarSituations(){
       search_client.search({
         index: es_config.indexes.main,
         type: self.type,
+        size: options.limit,
         query: {
           filtered: {
-            size: options.limit,
             query: {
               more_like_this: more_like_this
             },
