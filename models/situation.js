@@ -7,7 +7,6 @@ var RevisableDoc = require('./revisable');
 
 var design = require('./db/designs/situations');
 var db = require('./db').db;
-var es_config = config.get('elasticsearch');
 
 
 
@@ -261,6 +260,7 @@ Situation.prototype.relationships = function listSituationRelationships(){
   
   var callback = function(){};
   var options = {};
+  var es_config = config.get('elasticsearch');
 
   switch(arguments.length){
     case 1 :
@@ -301,6 +301,7 @@ Situation.prototype.causes = function listSituationCauses(){
   
   var callback = function(){};
   var options = {};
+  var es_config = config.get('elasticsearch');
 
   switch(arguments.length){
     case 1 :
@@ -335,6 +336,7 @@ Situation.prototype.effects = function listSituationEffects(){
   
   var callback = function(){};
   var options = {};
+  var es_config = config.get('elasticsearch');
 
   switch(arguments.length){
     case 1 :
@@ -369,6 +371,7 @@ Situation.prototype.similar = function listSimilarSituations(){
   
   var callback = function(){};
   var options = {};
+  var es_config = config.get('elasticsearch');
 
   switch(arguments.length){
     case 1 :

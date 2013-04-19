@@ -11,9 +11,6 @@ var ImmutableDoc = require('./immutable');
 var Change = require('./change');
 
 
-var es_config = config.get('elasticsearch');
-
-
 
 function RevisableDoc(id){
   if (!(this instanceof RevisableDoc)) return new RevisableDoc(id);
@@ -460,6 +457,7 @@ RevisableDoc.prototype.changes = function listRevisableDocChanges(){
   
   var callback = function(){};
   var options = {};
+  var es_config = config.get('elasticsearch');
 
   switch(arguments.length){
     case 1 :
