@@ -76,19 +76,28 @@ Situation.prototype.summarize = function summarizeSituation(callback){
   var self = this;
 
   var doc = new Doc(self.id);
+  var summary = {};
 
-  doc.read(function(read_error, doc_body){
-    if (read_error){ return callback(read_error, null) }
+  async.parallel([
+    function(parallel_callback){
+      doc.read(parallel_callback);
+    },
+    function(parallel_callback){
+      self.readFields([
+        'title',
+        'location',
+        'period',
+        'alias'
+      ], parallel_callback);
+    }
+  ], function(parallel_error, parallel_result){
+    if(parallel_error) { return callback(parallel_error, null) }
 
-    self.readFields(['title', 'location', 'period', 'alias'], function(
-      read_fields_error, 
-      fields
-    ){
-      if (read_fields_error){ return callback(read_fields_error, null) }
-      _.extend(doc_body, fields);
-
-      return callback(null, doc_body);
+    parallel_result.forEach(function(fields){
+      summary = _.extend(summary, fields);
     });
+
+    return callback(null, summary);
   });
 }
 
