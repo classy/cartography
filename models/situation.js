@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var curry = require('curry');
 var async = require('async');
 var config = require('../config');
 var search = require('../search');
@@ -8,6 +9,19 @@ var RevisableDoc = require('./revisable');
 var design = require('./db/designs/situations');
 var db = require('./db').db;
 
+
+
+function schonfinkelize(fn){
+  var slice = Array.prototype.slice;
+  var stored_args = slice.call(arguments, 1);
+
+  return function(){
+    var new_args = slice.call(arguments);
+    var args = stored_args.concat(new_args);
+
+    return fn.apply(null, args);
+  }
+}
 
 
 var Situation = function Situation(id){
@@ -101,13 +115,34 @@ Situation.prototype.summarize = function summarizeSituation(callback){
 }
 
 
-Situation.prototype.alias = function changeSituationAlias(alias, callback){
+Situation.prototype.alias = function changeSituationAlias(){
   var self = this;
+  var fn_args = arguments;
+  var changeAlias = curry(['alias'], self._change, self);
+
+  var alias;
+  var callback = function(){};
+  var additional_properties = {};
+
+  switch(arguments.length){
+    case 1 : 
+      alias = arguments[0]; 
+      break;
+    case 2 :
+      alias = arguments[0];
+      callback = arguments[1];
+      break;
+    case 3 :
+      alias = arguments[0];
+      additional_properties = arguments[1];
+      callback = arguments[2];
+      break;
+  }
 
   Situation.identify(alias, function(id_error, id){
     if (id_error){
       if (id_error.error == 'not_found'){
-        return self._change('alias', alias, callback);
+        return changeAlias.apply(self, fn_args);
       }
 
       return callback(id_error, null);
@@ -118,7 +153,7 @@ Situation.prototype.alias = function changeSituationAlias(alias, callback){
     situation.readField('alias', function(read_error, situation_alias){
       if (read_error){ return callback(read_error, null); }
       if (situation_alias != alias){
-        return self._change('alias', alias, callback);
+        return changeAlias.apply(self, fn_args);
       }
 
       var error = {
@@ -132,82 +167,165 @@ Situation.prototype.alias = function changeSituationAlias(alias, callback){
 }
 
 
-Situation.prototype.title = function changeSituationTitle(title, callback){
+Situation.prototype.title = function changeSituationTitle(){
   var self = this;
+  var changeTitle = curry(['title'], self._change, self);
 
-  return self._change('title', title, callback);
+  return changeTitle.apply(self, arguments);
 }
 
 
-Situation.prototype.period = function changeSituationPeriod(period, callback){
+Situation.prototype.period = function changeSituationPeriod(){
   var self = this;
+  var changePeriod = curry(['period'], self._change, self);
 
-  return self._change('period', period, callback);
+  return changePeriod.apply(self, arguments);
 }
 
 
-Situation.prototype.location = function changeSituationLocation(
-  location, 
-  callback
-){
+Situation.prototype.location = function changeSituationLocation(){
   var self = this;
+  var changeLocation = curry(['location'], self._change, self);
 
-  return self._change('location', location, callback);
+  return changeLocation.apply(self, arguments);
 }
 
 
-Situation.prototype.description = function changeSituationDescription(
-  description, 
-  callback
-){
+Situation.prototype.description = function changeSituationDescription(){
   var self = this;
+  var changeDescription = curry(['description'], self._change, self);
 
-  return self._change('description', description, callback);
+  return changeDescription.apply(self, arguments);
 }
 
 
-Situation.prototype.tag = function tagSituation(tag_name, callback){
+Situation.prototype.tag = function tagSituation(){
   var self = this;
-  self._add(
-    'tags', 
+  var addTag = curry(['tags'], self._add, self);
+  var tag_name;
+  var additional_properties = {};
+  var callback = function(){};
+
+  switch(arguments.length){
+    case 1 : 
+      tag_name = arguments[0]; 
+      break;
+    case 2 :
+      tag_name = arguments[0];
+      callback = arguments[1];
+      break;
+    case 3 :
+      tag_name = arguments[0];
+      additional_properties = arguments[1];
+      callback = arguments[2];
+      break;
+  }
+
+  additional_properties.summary = "Tagged '"+ tag_name +"'";
+  return addTag.apply(self, [
     tag_name, 
-    { summary: "Tagged '"+ tag_name +"'" },
+    additional_properties,
     callback
-  );
+  ]);
 }
 
 
-Situation.prototype.untag = function untagSituation(tag_name, callback){
+Situation.prototype.untag = function untagSituation(){
   var self = this;
-  self._remove(
-    'tags', 
+  var removeTag = curry(['tags'], self._remove, self);
+  var tag_name;
+  var additional_properties = {};
+  var callback = function(){};
+
+  switch(arguments.length){
+    case 1 : 
+      tag_name = arguments[0]; 
+      break;
+    case 2 :
+      tag_name = arguments[0];
+      callback = arguments[1];
+      break;
+    case 3 :
+      tag_name = arguments[0];
+      additional_properties = arguments[1];
+      callback = arguments[2];
+      break;
+  }
+
+  additional_properties.summary = "Removed tag '"+ tag_name +"'";
+  return removeTag.apply(self, [
     tag_name, 
-    { summary: "Removed tag '"+ tag_name +"'" },
+    additional_properties,
     callback
-  );
+  ]);
 }
 
 
-Situation.prototype.mark = function markSituation(mark_name, callback){
+Situation.prototype.mark = function markSituation(){
   var self = this;
-  self._set(
-    'marked', 
+  var mark = curry(['marked'], self._set, self);
+  var mark_name;
+  var additional_properties = {};
+  var callback = function(){};
+
+  switch(arguments.length){
+    case 1 : 
+      mark_name = arguments[0]; 
+      break;
+    case 2 :
+      mark_name = arguments[0];
+      callback = arguments[1];
+      break;
+    case 3 :
+      mark_name = arguments[0];
+      additional_properties = arguments[1];
+      callback = arguments[2];
+      break;
+  }
+
+  additional_properties.summary = "Marked '"+ mark_name.replace('_', ' ') +"'";
+  return mark.apply(self, [
     mark_name, 
     (new Date()).getTime(), 
-    { summary: "Marked '"+ mark_name.replace('_',' ') +"'" },
+    additional_properties,
     callback
-  );
+  ]);
 }
 
 
-Situation.prototype.unmark = function unmarkSituation(mark_name, callback){
+Situation.prototype.unmark = function unmarkSituation(){
   var self = this;
-  self._unset(
-    'marked', 
+  var unmark = curry(['marked'], self._unset, self);
+  var mark_name;
+  var additional_properties = {};
+  var callback = function(){};
+
+  switch(arguments.length){
+    case 1 : 
+      mark_name = arguments[0]; 
+      break;
+    case 2 :
+      mark_name = arguments[0];
+      callback = arguments[1];
+      break;
+    case 3 :
+      mark_name = arguments[0];
+      additional_properties = arguments[1];
+      callback = arguments[2];
+      break;
+  }
+
+  additional_properties.summary = [
+    "Removed mark '",
+    mark_name.replace('_', ' '),
+    "'"
+  ].join('');
+
+  return unmark.apply(self, [
     mark_name, 
-    { summary: "Removed mark '"+ mark_name.replace('_',' ') +"'" },
+    additional_properties,
     callback
-  );
+  ]);
 }
 
 

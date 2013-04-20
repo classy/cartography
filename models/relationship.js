@@ -1,4 +1,5 @@
 var async = require('async');
+var curry = require('curry');
 var _ = require('lodash');
 var db = require('./db').db;
 var design = require('./db/designs/relationships');
@@ -134,35 +135,81 @@ Relationship.prototype.summarize = function summarizeRelationship(callback){
 }
 
 
-function changeRelationshipDescription(description, callback){
-  return this._change('description', description, {
-    summary: "Changed description"
-  }, callback);
+function changeRelationshipDescription(){
+  var self = this;
+  var changeDescription = curry(['description'], self._change, self);
+
+  return changeDescription.apply(self, arguments);
 }
 
 Relationship.prototype.description = changeRelationshipDescription;
 
 
-Relationship.prototype.mark = function markRelationship(mark_name, callback){
+Relationship.prototype.mark = function markRelationship(){
   var self = this;
-  self._set(
-    'marked', 
+  var mark = curry(['marked'], self._set, self);
+  var mark_name;
+  var additional_properties = {};
+  var callback = function(){};
+
+  switch(arguments.length){
+    case 1 : 
+      mark_name = arguments[0]; 
+      break;
+    case 2 :
+      mark_name = arguments[0];
+      callback = arguments[1];
+      break;
+    case 3 :
+      mark_name = arguments[0];
+      additional_properties = arguments[1];
+      callback = arguments[2];
+      break;
+  }
+
+  additional_properties.summary = "Marked '"+ mark_name.replace('_', ' ') +"'";
+  return mark.apply(self, [
     mark_name, 
     (new Date()).getTime(), 
-    { summary: "Marked '"+ mark_name.replace('_',' ') +"'" },
+    additional_properties,
     callback
-  );
+  ]);
 }
 
 
-Relationship.prototype.unmark = function unmarkRelationship(mark_name, callback){
+Relationship.prototype.unmark = function unmarkRelationship(){
   var self = this;
-  self._unset(
-    'marked', 
+  var unmark = curry(['marked'], self._unset, self);
+  var mark_name;
+  var additional_properties = {};
+  var callback = function(){};
+
+  switch(arguments.length){
+    case 1 : 
+      mark_name = arguments[0]; 
+      break;
+    case 2 :
+      mark_name = arguments[0];
+      callback = arguments[1];
+      break;
+    case 3 :
+      mark_name = arguments[0];
+      additional_properties = arguments[1];
+      callback = arguments[2];
+      break;
+  }
+
+  additional_properties.summary = [
+    "Removed mark '",
+    mark_name.replace('_', ' '),
+    "'"
+  ].join('');
+
+  return unmark.apply(self, [
     mark_name, 
-    { summary: "Removed mark '"+ mark_name.replace('_',' ') +"'" },
+    additional_properties,
     callback
-  );
+  ]);
 }
 
 
