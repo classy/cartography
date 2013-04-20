@@ -72,7 +72,7 @@ async.series([
     casserole.title('Casserole Protests', cb);
   },
   function(cb){
-    casserole.alias('casserole-protests', cb);
+    casserole.alias('casserole-protests', {reason: 'catchy name'}, cb);
   },
   function(cb){
     casserole.location('Montreal, QC', cb);
