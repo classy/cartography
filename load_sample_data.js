@@ -101,6 +101,6 @@ async.series([
     law_causes_casserole.weaken(cb);
   }
 ], function(async_err, async_result){
-  if (async_err){ console.error(async_err) }
+  if (async_err){ return console.error(async_err) }
   console.log('Sample data loaded.');
 });
