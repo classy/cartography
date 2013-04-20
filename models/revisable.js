@@ -415,7 +415,7 @@ RevisableDoc.prototype.readField = function readRevisableDocField(
     limit: 1
   }
 
-  return db().view(
+  db().view(
     'revisables', 
     'changes_by_changed', 
     field_view_options, 
