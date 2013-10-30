@@ -3,7 +3,6 @@ var _ = require('lodash');
 var EventEmitter = require('events').EventEmitter;
 var db = require('./db').db;
 var nano = require('./db').nano;
-var search = require('../search');
 
 
 
