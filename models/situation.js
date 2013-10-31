@@ -205,7 +205,8 @@ Situation.prototype.delete = function deleteSituation(callback){
   var self = this;
 
   var view_options = {
-    key: self.id
+    startkey: [ self.id ],
+    endkey: [ self.id, {} ]
   }
 
   db().view(
