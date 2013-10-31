@@ -360,9 +360,9 @@ RevisableDoc.prototype.read = function readRevisableDoc(callback){
       };
 
       db().view('revisables', 'changes_by_changed', view_options, function(
-        view_err, view_result
+        view_error, view_result
       ){
-        if (view_err){ return parallel_cb(view_err, null) }
+        if (view_error){ return parallel_cb(view_error, null) }
         if (!view_result.rows){ return parallel_cb(null, {}) }
 
         var change_ids = view_result.rows.map(function(row){
@@ -371,8 +371,8 @@ RevisableDoc.prototype.read = function readRevisableDoc(callback){
 
         return db().view('changes', 'field_summary', 
           { keys: change_ids },
-          function(view_err, view_result){
-            if (view_err){ return parallel_cb(view_err, null) }
+          function(view_error, view_result){
+            if (view_error){ return parallel_cb(view_error, null) }
             
             var up_to_date_fields = {};
 
@@ -418,8 +418,8 @@ RevisableDoc.prototype.readField = function readRevisableDocField(
     'revisables', 
     'changes_by_changed', 
     field_view_options, 
-    function(view_err, view_result){
-      if (view_err){ return callback(view_err, null) }
+    function(view_error, view_result){
+      if (view_error){ return callback(view_error, null) }
       if (!view_result.rows.length){ return callback(null, undefined) }
 
       return callback(null, view_result.rows[0].value.to);
@@ -467,8 +467,8 @@ RevisableDoc.prototype.changes = function listRevisableDocChanges(callback){
     'revisables',
     'changes_by_changed',
     field_view_options,
-    function(view_err, view_result){
-      if (view_err){ return callback(view_err, null) }
+    function(view_error, view_result){
+      if (view_error){ return callback(view_error, null) }
       if (!view_result.rows.length){ return callback(null, undefined) }
 
       return callback(null, view_result.rows.map(
