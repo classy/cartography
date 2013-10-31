@@ -8,6 +8,14 @@ var Adjustment = require('./adjustment');
 var RevisableDoc = require('./revisable');
 
 
+// Creating a relationship:
+//
+// > relationship = new Relationship()
+// > relationship.create({
+// ...  cause: { _id: situation1.id },
+// ...  effect: { _id: situation2.id }
+// ...  }, callback)
+
 
 var Relationship = function Relationship(id){
   if (!(this instanceof Relationship)) return new Relationship(id);
