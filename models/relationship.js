@@ -4,7 +4,6 @@ var db = require('./db').db;
 var design = require('./db/designs/relationships');
 
 var Doc = require('./doc');
-var Adjustment = require('./adjustment');
 var RevisableDoc = require('./revisable');
 
 
@@ -102,15 +101,6 @@ Relationship.prototype.summarize = function summarizeRelationship(callback){
 
     async.parallel([
       function(parallel_cb){
-        self.strength(function(strength_error, strength_rating){
-          if (strength_error){ return parallel_cb(strength_error) }
-          
-          rel_body.strength = strength_rating;
-
-          return parallel_cb(null, strength_rating);
-        });
-      },
-      function(parallel_cb){
         cause.readFields([
           'title',
           'location',
@@ -171,89 +161,6 @@ Relationship.prototype.unmark = function unmarkRelationship(mark_name, callback)
     { summary: "Removed mark '"+ mark_name.replace('_',' ') +"'" },
     callback
   );
-}
-
-
-function strengthAdjuster(by){
-  return function(callback){
-    var self = this;
-  
-    var new_adjustment = new Adjustment();
-    new_adjustment.create({
-      adjusted: {
-        doc: { _id: self.id, type: 'relationship' },
-        field: { name: 'strength', by: by }
-      }
-    }, function(create_adjustment_error, create_adjustment_result){
-      if (create_adjustment_error){
-        return callback(create_adjustment_error, null);
-      }
-  
-      return callback(null, create_adjustment_result);
-    });
-  }
-}
-
-
-Relationship.prototype.strengthen = strengthAdjuster(1);
-Relationship.prototype.weaken = strengthAdjuster(-1);
-
-
-Relationship.prototype.strength = function relationshipStrength(callback){
-  var self = this;
-
-  var view_options = {
-    endkey: [ self.id, 'strength' ],
-    startkey: [ self.id, 'strength', {} ],
-    descending: true
-  }
-
-  db().view('adjustments', 'by_adjusted_field', view_options, function(
-    view_error, view_result
-  ){
-    if (view_error){ return callback(view_error, null) }
-    if (!view_result.rows.length){
-      return callback(null, 0);
-    }
-
-    return callback(null, view_result.rows[0].value);
-  });
-};
-
-
-Relationship.prototype.delete = function deleteRelationship(callback){
-  var self = this;
-
-  var view_options = {
-    startkey: [ self.id ],
-    endkey: [ self.id, {} ],
-    include_docs: true,
-    reduce: false
-  }
-
-  db().view('adjustments', 'by_adjusted_field', view_options, function(
-    view_error,
-    view_result
-  ){
-    if (view_error){ return callback(view_error, null) }
-    
-    var docs = view_result.rows.map(function(row){
-      var doc = _.clone(row.doc);
-      doc._deleted = true;
-      return doc;
-    });
-
-    db().bulk({ docs: docs }, function(bulk_error, bulk_delete){
-      if (bulk_error){ return callback(bulk_error, null) }
-
-      docs.map(function(doc_body){
-        var adjustment = new Adjustment(doc_body._id);
-        adjustment.emit('delete');
-      });
-
-      RevisableDoc.prototype.delete.call(self, callback)
-    });
-  });
 }
 
 
