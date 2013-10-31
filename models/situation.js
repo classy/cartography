@@ -1,14 +1,12 @@
 var _ = require('lodash');
 var async = require('async');
 var config = require('../config');
-var search = require('../search');
 var Doc = require('./doc');
 var RevisableDoc = require('./revisable');
 var Relationship = require('./relationship');
 
 var design = require('./db/designs/situations');
 var db = require('./db').db;
-var es_config = config.get('elasticsearch');
 
 
 
@@ -251,58 +249,70 @@ Situation.prototype.relationships = function listSituationRelationships(
   callback
 ){
   var self = this;
-  var search_client = search.client();
+  var view_options = {
+    startkey: [ self.id ],
+    endkey: [ self.id, {} ],
+    include_docs: true
+  }
 
-  search_client.search({
-    type: "relationship",
-    index: es_config.indexes.main,
-    sort: [
-      { strength: "desc" },
-      { creation_date: "desc" }
-    ],
-    filter: {
-      or: [
-        { term: { "cause._id": self.id } },
-        { term: { "effect._id": self.id } }
-      ]
+  db().view(
+    'relationships',
+    'by_cause_or_effect',
+    view_options,
+    function(view_error, view_result){
+      if (view_error){ return callback(view_error, null) }
+      return callback(
+        null, 
+        view_result.rows.map(function(row){ return row.doc })
+      )
     }
-  }, callback);
+  );
 }
 
 
 Situation.prototype.causes = function listSituationCauses(callback){
   var self = this;
-  var search_client = search.client();
+  var view_options = {
+    startkey: [ self.id, 'effect' ],
+    endkey: [ self.id, 'effect', {} ],
+    include_docs: true
+  }
 
-  search_client.search({
-    type: "relationship",
-    index: es_config.indexes.main,
-    sort: [
-      { strength: "desc" },
-      { creation_date: "desc" }
-    ],
-    filter: {
-      term: { "effect._id": self.id }
+  db().view(
+    'relationships',
+    'by_cause_or_effect',
+    view_options,
+    function(view_error, view_result){
+      if (view_error){ return callback(view_error, null) }
+      return callback(
+        null,
+        view_result.rows.map(function(row){ return row.doc })
+      )
     }
-  }, callback);
+  )
 }
 
 
 Situation.prototype.effects = function listSituationEffects(callback){
   var self = this;
-  var search_client = search.client();
+  var view_options = {
+    startkey: [ self.id, 'cause' ],
+    endkey: [ self.id, 'cause', {} ],
+    include_docs: true
+  }
 
-  search_client.search({
-    type: "relationship",
-    index: es_config.indexes.main,
-    sort: [
-      { strength: "desc" },
-      { creation_date: "desc" }
-    ],
-    filter: {
-      term: { "cause._id": self.id }
+  db().view(
+    'relationships',
+    'by_cause_or_effect',
+    view_options,
+    function(view_error, view_result){
+      if (view_error){ return callback(view_error, null) }
+      return callback(
+        null,
+        view_result.rows.map(function(row){ return row.doc })
+      )
     }
-  }, callback);
+  )
 }
 
 
