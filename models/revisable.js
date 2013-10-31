@@ -3,15 +3,11 @@ var async = require('async');
 
 var db = require('./db').db;
 
-var search = require('../search');
 var config = require('../config');
 var design = require('./db/designs/revisables');
 var Doc = require('./doc');
 var ImmutableDoc = require('./immutable');
 var Change = require('./change');
-
-
-var es_config = config.get('elasticsearch');
 
 
 
@@ -458,18 +454,30 @@ RevisableDoc.prototype.readFields = function readRevisableDocFields(
 
 RevisableDoc.prototype.changes = function listRevisableDocChanges(callback){
   var self = this;
-  var search_client = search.client();
 
-  search_client.search({
-    type: "change",
-    index: es_config.indexes.main,
-    sort: [
-      { creation_date: "desc" }
-    ],
-    filter: {
-      term: { "changed.doc._id": self.id }
+  var field_view_options = {
+    endkey: [self.id],
+    startkey: [self.id, {}],
+    descending: true,
+    reduce: false,
+    include_docs: true
+  }
+
+  db().view(
+    'revisables',
+    'changes_by_changed',
+    field_view_options,
+    function(view_err, view_result){
+      if (view_err){ return callback(view_err, null) }
+      if (!view_result.rows.length){ return callback(null, undefined) }
+
+      return callback(null, view_result.rows.map(
+        function(row){ 
+          return row.doc 
+        }
+      ));
     }
-  }, callback);
+  );
 }
 
 
