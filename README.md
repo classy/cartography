@@ -71,16 +71,18 @@ greenhoust_gasses.title('Greenhouse Gasses in the Atmosphere', console.log);
 //   rev: '1-6fc199d68bf98f4a383b7d02f77b4d50' }
 
 
-
-var greenhouse_gasses_cause_global_warming = new Relationship();
-
-greenhouse_gasses_cause_global_warming.create({
-  cause: { _id: greenhouse_gasses.id }, // '514d5202e601ef23aa661e605d006adb'
-  effect: { _id: global_warming.id }    // '514d5202e601ef23aa661e605d005c6d'
-}, console.log);
+greenhouse_gasses.caused(global_warming, console.log);
 // > null { ok: true,
 //   id: '514d5202e601ef23aa661e605d007452',
 //   rev: '1-e21fb71c491a14822f96d894384adaec' }
+
+
+
+// The `id` from the last operation is the id of the newly created
+// relationship.
+var greenhouse_gasses_cause_global_warming = new Relationship(
+  '514d5202e601ef23aa661e605d007452'
+);
 
 
 
