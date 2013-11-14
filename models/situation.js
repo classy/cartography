@@ -270,6 +270,30 @@ Situation.prototype.relationships = function listSituationRelationships(
 }
 
 
+Situation.prototype.caused = function addSituationEffect(effect, callback){
+  var self = this;
+  var effect_id = effect.id || effect._id || effect;
+
+  var new_relationship = new Relationship();
+  new_relationship.create({
+    cause: { _id: self.id },
+    effect: { _id: effect_id }
+  }, callback);
+}
+
+
+Situation.prototype.because = function addSituationCause(cause, callback){
+  var self = this;
+  var cause_id = cause.id || cause._id || cause;
+
+  var new_relationship = new Relationship();
+  new_relationship.create({
+    cause: { _id: cause_id },
+    effect: { _id: self.id }
+  }, callback);
+}
+
+
 Situation.prototype.causes = function listSituationCauses(callback){
   var self = this;
   var view_options = {
