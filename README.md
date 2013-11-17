@@ -2,7 +2,7 @@ Cartography
 ===============================================================================
 
 A low-level library that handles situations, their causal relationships, and
-histories.
+the histories of both.
 
 This library is a dependency of Causemap, which extends Cartography and adds
 other features.
