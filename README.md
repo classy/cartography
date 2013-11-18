@@ -20,8 +20,24 @@ Dependencies
 Installation
 -------------------------------------------------------------------------------
 
+From [source](https://github.com/classy/cartography):
+
 ```bash
 npm install
+```
+
+Then install the CouchDB design documents:
+
+```javascript
+var cartography = require('cartography');
+cartography.config.set({
+  couchdb: {
+    host: "http://username:password@localhost:5984",
+    database: "cartography"
+  }
+});
+
+cartography.install(console.log);
 ```
 
 
