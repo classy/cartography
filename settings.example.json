@@ -3,5 +3,11 @@
     // http://<username>:<password>@<couchdb>:<port>
     "host": "http://cindy:derpison@localhost:5984",
     "database": "cartography"
+  },
+
+  // These details will be used to configure a couchdb for testing
+  "couchdb_test": {
+    "host": "http://adminner:passworded@localhost:5984",
+    "database": "cartography_testing"
   }
 }
