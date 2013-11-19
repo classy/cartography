@@ -10,19 +10,6 @@ var db = require('./db').db;
 
 
 
-function schonfinkelize(fn){
-  var slice = Array.prototype.slice;
-  var stored_args = slice.call(arguments, 1);
-
-  return function(){
-    var new_args = slice.call(arguments);
-    var args = stored_args.concat(new_args);
-
-    return fn.apply(null, args);
-  }
-}
-
-
 var Situation = function Situation(id){
   if (!(this instanceof Situation)) return new Situation(id);
   if (id) { this.id = id; }
