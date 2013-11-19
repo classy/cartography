@@ -3,7 +3,6 @@ var async = require('async');
 
 var db = require('./db').db;
 
-var search = require('../search');
 var config = require('../config');
 var design = require('./db/designs/revisables');
 var Doc = require('./doc');
@@ -361,9 +360,9 @@ RevisableDoc.prototype.read = function readRevisableDoc(callback){
       };
 
       db().view('revisables', 'changes_by_changed', view_options, function(
-        view_err, view_result
+        view_error, view_result
       ){
-        if (view_err){ return parallel_cb(view_err, null) }
+        if (view_error){ return parallel_cb(view_error, null) }
         if (!view_result.rows){ return parallel_cb(null, {}) }
 
         var change_ids = view_result.rows.map(function(row){
@@ -372,8 +371,8 @@ RevisableDoc.prototype.read = function readRevisableDoc(callback){
 
         return db().view('changes', 'field_summary', 
           { keys: change_ids },
-          function(view_err, view_result){
-            if (view_err){ return parallel_cb(view_err, null) }
+          function(view_error, view_result){
+            if (view_error){ return parallel_cb(view_error, null) }
             
             var up_to_date_fields = {};
 
@@ -419,8 +418,8 @@ RevisableDoc.prototype.readField = function readRevisableDocField(
     'revisables', 
     'changes_by_changed', 
     field_view_options, 
-    function(view_err, view_result){
-      if (view_err){ return callback(view_err, null) }
+    function(view_error, view_result){
+      if (view_error){ return callback(view_error, null) }
       if (!view_result.rows.length){ return callback(null, undefined) }
 
       return callback(null, view_result.rows[0].value.to);
@@ -471,19 +470,31 @@ RevisableDoc.prototype.changes = function listRevisableDocChanges(){
   }
 
   var self = this;
-  var search_client = search.client();
 
-  search_client.search({
-    type: "change",
-    index: es_config.indexes.main,
-    size: options.limit,
-    sort: [
-      { creation_date: "desc" }
-    ],
-    filter: {
-      term: { "changed.doc._id": self.id }
+  var field_view_options = {
+    endkey: [self.id],
+    startkey: [self.id, {}],
+    descending: true,
+    reduce: false,
+    include_docs: true,
+    limit: options.limit
+  }
+
+  db().view(
+    'revisables',
+    'changes_by_changed',
+    field_view_options,
+    function(view_error, view_result){
+      if (view_error){ return callback(view_error, null) }
+      if (!view_result.rows.length){ return callback(null, undefined) }
+
+      return callback(null, view_result.rows.map(
+        function(row){ 
+          return row.doc 
+        }
+      ));
     }
-  }, callback);
+  );
 }
 
 

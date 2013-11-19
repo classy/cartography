@@ -50,8 +50,8 @@ module.exports = {
     by_cause_or_effect: {
       map: function(doc){
         if (doc.type == 'relationship'){
-          emit(doc.cause._id, null);
-          emit(doc.effect._id, null);
+          emit([ doc.cause._id, 'cause' ], null);
+          emit([ doc.effect._id, 'effect' ], null);
         }
       }
     },

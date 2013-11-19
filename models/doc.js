@@ -1,15 +1,15 @@
 var util = require('util');
+var config = require('../config');
 var _ = require('lodash');
 var EventEmitter = require('events').EventEmitter;
 var db = require('./db').db;
 var nano = require('./db').nano;
-var search = require('../search');
 
 
 
 function getHeaders(id, callback){
   var request_options = {
-    db: 'cartography',
+    db: config.get('couchdb').database,
     doc: id,
     method: 'HEAD'
   }

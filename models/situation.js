@@ -2,7 +2,6 @@ var _ = require('lodash');
 var curry = require('curry');
 var async = require('async');
 var config = require('../config');
-var search = require('../search');
 var Doc = require('./doc');
 var RevisableDoc = require('./revisable');
 
@@ -333,7 +332,8 @@ Situation.prototype.delete = function deleteSituation(callback){
   var self = this;
 
   var view_options = {
-    key: self.id
+    startkey: [ self.id ],
+    endkey: [ self.id, {} ]
   }
 
   db().view(
@@ -395,22 +395,47 @@ Situation.prototype.relationships = function listSituationRelationships(){
   var search_client = search.client();
 
   var self = this;
-  var search_client = search.client();
+  var view_options = {
+    startkey: [ self.id ],
+    endkey: [ self.id, {} ],
+    include_docs: true
+  }
 
-  search_client.search({
-    type: "relationship",
-    index: es_config.indexes.main,
-    size: options.limit,
-    sort: [
-      { strength: "desc" },
-      { creation_date: "desc" }
-    ],
-    filter: {
-      or: [
-        { term: { "cause._id": self.id } },
-        { term: { "effect._id": self.id } }
-      ]
+  db().view(
+    'relationships',
+    'by_cause_or_effect',
+    view_options,
+    function(view_error, view_result){
+      if (view_error){ return callback(view_error, null) }
+      return callback(
+        null, 
+        view_result.rows.map(function(row){ return row.doc })
+      )
     }
+  );
+}
+
+
+Situation.prototype.caused = function addSituationEffect(effect, callback){
+  var self = this;
+  var effect_id = effect.id || effect._id || effect;
+
+  var new_relationship = new Relationship();
+  new_relationship.create({
+    cause: { _id: self.id },
+    effect: { _id: effect_id }
+  }, callback);
+}
+
+
+Situation.prototype.because = function addSituationCause(cause, callback){
+  var self = this;
+  var cause_id = cause.id || cause._id || cause;
+
+  var new_relationship = new Relationship();
+  new_relationship.create({
+    cause: { _id: cause_id },
+    effect: { _id: self.id }
   }, callback);
 }
 
@@ -433,20 +458,24 @@ Situation.prototype.causes = function listSituationCauses(){
   }
 
   var self = this;
-  var search_client = search.client();
+  var view_options = {
+    startkey: [ self.id, 'effect' ],
+    endkey: [ self.id, 'effect', {} ],
+    include_docs: true
+  }
 
-  search_client.search({
-    type: "relationship",
-    index: es_config.indexes.main,
-    size: options.limit,
-    sort: [
-      { strength: "desc" },
-      { creation_date: "desc" }
-    ],
-    filter: {
-      term: { "effect._id": self.id }
+  db().view(
+    'relationships',
+    'by_cause_or_effect',
+    view_options,
+    function(view_error, view_result){
+      if (view_error){ return callback(view_error, null) }
+      return callback(
+        null,
+        view_result.rows.map(function(row){ return row.doc })
+      )
     }
-  }, callback);
+  )
 }
 
 
@@ -468,20 +497,24 @@ Situation.prototype.effects = function listSituationEffects(){
   }
 
   var self = this;
-  var search_client = search.client();
+  var view_options = {
+    startkey: [ self.id, 'cause' ],
+    endkey: [ self.id, 'cause', {} ],
+    include_docs: true
+  }
 
-  search_client.search({
-    type: "relationship",
-    index: es_config.indexes.main,
-    size: options.limit,
-    sort: [
-      { strength: "desc" },
-      { creation_date: "desc" }
-    ],
-    filter: {
-      term: { "cause._id": self.id }
+  db().view(
+    'relationships',
+    'by_cause_or_effect',
+    view_options,
+    function(view_error, view_result){
+      if (view_error){ return callback(view_error, null) }
+      return callback(
+        null,
+        view_result.rows.map(function(row){ return row.doc })
+      )
     }
-  }, callback);
+  )
 }
 
 
