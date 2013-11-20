@@ -37,9 +37,7 @@ suite('A Situation', function(){
     })
   });
 
-  suite('instantiated without an id', function(){
-    var situation = new Situation();
-
+  function instantiatedOkay(situation){
     test('should return an instance of `Situation`', function(){
       situation.should.be.an.instanceOf(Situation);
     });
@@ -47,21 +45,19 @@ suite('A Situation', function(){
     test('should be of type "situation"', function(){
       situation.should.have.property('type', 'situation');
     });
+  }
+
+  suite('instantiated without an id', function(){
+    var situation = new Situation();
+    instantiatedOkay(situation);
   });
 
   suite('instantiated with an id', function(){
     var situation = new Situation('1234');
-
-    test('should return an instance of `Situation`', function(){
-      situation.should.be.an.instanceOf(Situation);
-    });
+    instantiatedOkay(situation);
 
     test('should should return an object with an `id`', function(){
       situation.should.have.property('id');
-    });
-
-    test('should be of type `situation`', function(){
-      situation.should.have.property('type', 'situation');
     });
   });
 
@@ -109,141 +105,50 @@ suite('A Situation', function(){
     });
 
     suite('and its', function(){
-      suite('title is changed', function(){
-        var title_result;
-
-        setup(function(done){
-          situation.title('test', function(err, res){
-            if (err) return done(err);
-            title_result = res;
-            return done();
-          });
-        });
-
-        test('the `_id` of the change is returned', function(){
-          title_result.should.be.an.instanceOf(Object);
-          title_result.should.have.property('ok', true);
-          title_result.should.have.property('id');
-        });
-
-        suite('and the situation is read', function(){
-          var situation_body;
+      function changeField(field_name){
+        suite(field_name +' is changed', function(){
+          var result;
 
           setup(function(done){
-            situation.read(function(err, res){
+            situation[field_name]('test', function(err, res){
               if (err) return done(err);
-              situation_body = res;
+              result = res;
               return done();
             });
           });
 
-          test('the change is reflected in the document body', function(){
-            situation_body.should.have.property('title', 'test');
+          test('the `_id` of the change is returned', function(){
+            result.should.be.an.instanceOf(Object);
+            result.should.have.property('ok', true);
+            result.should.have.property('id');
           });
-        });
-      });
 
-      suite('description is changed', function(){
-        var description_result;
+          suite('and the situation is read', function(){
+            var situation_body;
 
-        setup(function(done){
-          situation.description('test', function(err, res){
-            if (err) return done(err);
-            description_result = res;
-            return done();
-          });
-        });
+            setup(function(done){
+              situation.read(function(err, res){
+                if (err) return done(err);
+                situation_body = res;
+                return done();
+              });
+            });
 
-        test('the `_id` of the change is returned', function(){
-          description_result.should.be.an.instanceOf(Object);
-          description_result.should.have.property('ok', true);
-          description_result.should.have.property('id');
-        });
-
-        suite('and the situation is read', function(){
-          var situation_body;
-
-          setup(function(done){
-            situation.read(function(err, res){
-              if (err) return done(err);
-              situation_body = res;
-              return done();
+            test('the change is reflected in the document body', function(){
+              situation_body.should.have.property(field_name, 'test');
             });
           });
-
-          test('the change is reflected in the document body', function(){
-            situation_body.should.have.property('description', 'test');
-          });
         });
-      });
+      }
 
-      suite('period is changed', function(){
-        var period_result;
+      var field_names = [
+        'title',
+        'description',
+        'period',
+        'location'
+      ]
 
-        setup(function(done){
-          situation.period('test', function(err, res){
-            if (err) return done(err);
-            period_result = res;
-            return done();
-          });
-        });
-
-        test('the `_id` of the change is returned', function(){
-          period_result.should.be.an.instanceOf(Object);
-          period_result.should.have.property('ok', true);
-          period_result.should.have.property('id');
-        });
-
-        suite('and the situation is read', function(){
-          var situation_body;
-
-          setup(function(done){
-            situation.read(function(err, res){
-              if (err) return done(err);
-              situation_body = res;
-              return done();
-            });
-          });
-
-          test('the change is reflected in the document body', function(){
-            situation_body.should.have.property('period', 'test');
-          });
-        });
-      });
-
-      suite('location is changed', function(){
-        var location_result;
-
-        setup(function(done){
-          situation.location('test', function(err, res){
-            if (err) return done(err);
-            location_result = res;
-            return done();
-          });
-        });
-
-        test('the `_id` of the change is returned', function(){
-          location_result.should.be.an.instanceOf(Object);
-          location_result.should.have.property('ok', true);
-          location_result.should.have.property('id');
-        });
-
-        suite('and the situation is read', function(){
-          var situation_body;
-
-          setup(function(done){
-            situation.read(function(err, res){
-              if (err) return done(err);
-              situation_body = res;
-              return done();
-            });
-          });
-
-          test('the change is reflected in the document body', function(){
-            situation_body.should.have.property('location', 'test');
-          });
-        });
-      });
+      field_names.forEach(changeField);
     });
 
     suite('and it\'s', function(){
@@ -275,7 +180,7 @@ suite('A Situation', function(){
             });
           });
 
-          test('the change is reflected in the document body', function(){
+          test('`marked` should have the property with the mark name.', function(){
             situation_body.should.have.property('marked');
             situation_body.marked.should.have.property('stupid');
           });
@@ -308,8 +213,10 @@ suite('A Situation', function(){
                 });
               });
     
-              test('the change is reflected in the document body', function(){
+              test('the `marked` field is empty', function(){
                 situation_body.marked.should.be.empty;
+                // TODO: there shouldn't be a `marked` field if there are no
+                // marks
               });
             });
           });
@@ -378,8 +285,10 @@ suite('A Situation', function(){
                 });
               });
 
-              test('the change is reflected in the document body', function(){
+              test('the `tags` field should be empty', function(){
                 situation_body.tags.should.be.empty;
+                // TODO: there shouldn't be a `tags` field if there are no
+                // tags.
               });
             });
 
