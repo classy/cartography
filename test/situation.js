@@ -149,9 +149,100 @@ suite('A Situation', function(){
       ]
 
       field_names.forEach(changeField);
+
+      suite('alias is changed', function(){
+        var result;
+
+        setup(function(done){
+          situation.alias('test', function(err, res){
+            if (err) return done(err);
+            result = res;
+            return done();
+          });
+        });
+
+        test('the `_id` of the change is returned', function(){
+          result.should.be.an.instanceOf(Object);
+          result.should.have.property('ok', true);
+          result.should.have.property('id');
+        });
+        
+        suite('and the situation is read', function(){
+          var situation_body;
+
+          setup(function(done){
+            situation.read(function(err, res){
+              if (err) return done(err);
+              situation_body = res;
+              return done();
+            });
+          });
+
+          test('the change is reflected in the document body', function(){
+            situation_body.should.have.property('alias', 'test');
+          });
+        });
+
+        suite('and the situation is identified by its alias', function(){
+          var identified_situation_id;
+
+          setup(function(done){
+            Situation.identify('test', function(err, res){
+              if (err) return done(err);
+              identified_situation_id = res;
+              return done();
+            });
+          });
+
+          test('the situation id is returned', function(){
+            should.exist(identified_situation_id);
+            identified_situation_id.should.be.type('string');
+          });
+        });
+
+        suite('and another situation is given the same alias', function(){
+          var situation_2 = new Situation();
+          var aliasing_result = null;
+          var aliasing_error = null;
+
+          setup(function(done){
+            situation_2.create(function(creation_err, creation_res){
+              if (creation_err) return done(creation_err);
+
+              situation_2.alias('test', function(err, res){
+                aliasing_result = res;
+                aliasing_error = err;
+                return done();
+              });
+            });
+          });
+
+          test('an error should be returned', function(){
+            should(aliasing_error).be.ok;
+            aliasing_error.should.be.instanceOf(Object);
+          });
+        });
+
+        suite('and given another alias', function(){
+          setup(function(done){
+            situation.alias('test2', done);
+          });
+
+          test('it can still be identified by the old alias', function(done){
+            Situation.identify('test', function(err, id){
+              should.not.exist(err);
+              should.exist(id);
+              id.should.be.type('string');
+              id.should.equal(situation.id);
+              done();
+            });
+          });
+        });
+      });
     });
 
     suite('and it\'s', function(){
+
       suite('marked', function(){
         var mark_result;
 
