@@ -13,7 +13,7 @@ var database_name = cartography.config.get('couchdb').database;
 
 
 suite('Situations', function(){
-  setup(function(done){
+  suiteSetup(function(done){
     nano.db.destroy(database_name, function(destroy_error, destroy_result){
       if (destroy_error){ 
         if (destroy_error.error != 'not_found'){ throw destroy_error }
@@ -28,7 +28,7 @@ suite('Situations', function(){
     });
   });
 
-  teardown(function(done){
+  suiteTeardown(function(done){
     nano.db.destroy(database_name, function(destroy_error, destroy_result){
       if (destroy_error){
         if (destroy_error.error != 'not_found') { throw destroy_error }
@@ -64,11 +64,11 @@ suite('Situations', function(){
   suite('when created', function(){
     var situation = new Situation();
 
-    setup(function(done){
+    suiteSetup(function(done){
       situation.create(done);
     });
 
-    teardown(function(done){
+    suiteTeardown(function(done){
       situation.delete(done);
     });
 
@@ -95,7 +95,7 @@ suite('Situations', function(){
     suite('and read', function(){
       var situation_body;
 
-      setup(function(done){
+      suiteSetup(function(done){
         situation.read(function(err, res){
           if (err) return done(err);
           situation_body = res;
@@ -125,7 +125,7 @@ suite('Situations', function(){
         suite(field_name +' is changed', function(){
           var result;
 
-          setup(function(done){
+          suiteSetup(function(done){
             situation[field_name]('test', function(err, res){
               if (err) return done(err);
               result = res;
@@ -142,7 +142,7 @@ suite('Situations', function(){
           suite('and the situation is read', function(){
             var situation_body;
 
-            setup(function(done){
+            suiteSetup(function(done){
               situation.read(function(err, res){
                 if (err) return done(err);
                 situation_body = res;
@@ -169,7 +169,7 @@ suite('Situations', function(){
       suite('alias is changed', function(){
         var result;
 
-        setup(function(done){
+        suiteSetup(function(done){
           situation.alias('test', function(err, res){
             if (err) return done(err);
             result = res;
@@ -186,7 +186,7 @@ suite('Situations', function(){
         suite('and the situation is read', function(){
           var situation_body;
 
-          setup(function(done){
+          suiteSetup(function(done){
             situation.read(function(err, res){
               if (err) return done(err);
               situation_body = res;
@@ -202,7 +202,7 @@ suite('Situations', function(){
         suite('and the situation is identified by its alias', function(){
           var identified_situation_id;
 
-          setup(function(done){
+          suiteSetup(function(done){
             Situation.identify('test', function(err, res){
               if (err) return done(err);
               identified_situation_id = res;
@@ -221,7 +221,7 @@ suite('Situations', function(){
           var aliasing_result = null;
           var aliasing_error = null;
 
-          setup(function(done){
+          suiteSetup(function(done){
             situation_2.create(function(creation_err, creation_res){
               if (creation_err) return done(creation_err);
 
@@ -240,7 +240,7 @@ suite('Situations', function(){
         });
 
         suite('and given another alias', function(){
-          setup(function(done){
+          suiteSetup(function(done){
             situation.alias('test2', done);
           });
 
@@ -262,7 +262,7 @@ suite('Situations', function(){
       suite('marked', function(){
         var mark_result;
 
-        setup(function(done){
+        suiteSetup(function(done){
           situation.mark('stupid', function(err, res){
             if (err) return done(err);
             mark_result = res;
@@ -279,7 +279,7 @@ suite('Situations', function(){
         suite('and the situation is read', function(){
           var situation_body;
 
-          setup(function(done){
+          suiteSetup(function(done){
             situation.read(function(err, res){
               if (err) return done(err);
               situation_body = res;
@@ -295,7 +295,7 @@ suite('Situations', function(){
           suite('and unmarked', function(){
             var change_result;
 
-            setup(function(done){
+            suiteSetup(function(done){
               situation.unmark('stupid', function(err, res){
                 if (err) return done(err);
                 change_result = res;
@@ -312,7 +312,7 @@ suite('Situations', function(){
             suite('and the situation is read', function(){
               var situation_body;
     
-              setup(function(done){
+              suiteSetup(function(done){
                 situation.read(function(err, res){
                   if (err) return done(err);
                   situation_body = res;
@@ -333,7 +333,7 @@ suite('Situations', function(){
       suite('tagged', function(){
         var tag_result;
 
-        setup(function(done){
+        suiteSetup(function(done){
           situation.tag('stupid', function(err, res){
             if (err) return done(err);
             tag_result = res;
@@ -350,7 +350,7 @@ suite('Situations', function(){
         suite('and the situation is read', function(){
           var situation_body;
 
-          setup(function(done){
+          suiteSetup(function(done){
             situation.read(function(err, res){
               if (err) return done(err);
               situation_body = res;
@@ -367,7 +367,7 @@ suite('Situations', function(){
           suite('and untagged', function(){
             var change_result;
 
-            setup(function(done){
+            suiteSetup(function(done){
               situation.untag('stupid', function(err, res){
                 if (err) return done(err);
                 change_result = res;
@@ -384,7 +384,7 @@ suite('Situations', function(){
             suite('and the situation is read again', function(){
               var situation_body;
 
-              setup(function(done){
+              suiteSetup(function(done){
                 situation.read(function(err, res){
                   if (err) return done(err);
                   situation_body = res;
@@ -404,7 +404,7 @@ suite('Situations', function(){
     });
 
     suite('and changed', function(){
-      setup(function(done){
+      suiteSetup(function(done){
         situation.title('sample situation', function(error){
           if (error) return done(error);
           situation.location('sample location', function(error){
