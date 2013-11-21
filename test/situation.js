@@ -63,28 +63,19 @@ suite('Situations', function(){
 
   suite('when created', function(){
     var situation = new Situation();
+    var situation_2 = new Situation();
 
     suiteSetup(function(done){
-      situation.create(done);
-    });
-
-    suiteTeardown(function(done){
-      situation.delete(done);
-    });
-
-    test('can be a cause', function(done){
-      var situation_2 = new Situation();
-      situation_2.create(function(err, res){
+      situation.create(function(err, res){
         if (err) return done(err);
-        situation.caused(situation_2, done);
+        situation_2.create(done);
       });
     });
 
-    test('can be an effect', function(done){
-      var situation_2 = new Situation();
-      situation_2.create(function(err, res){
+    suiteTeardown(function(done){
+      situation_2.delete(function(err, res){
         if (err) return done(err);
-        situation.because(situation_2, done);
+        situation.delete(done);
       });
     });
 
@@ -437,6 +428,27 @@ suite('Situations', function(){
             'sample period'
           )
 
+          done();
+        });
+      });
+    });
+
+    suite('with relationships', function(){
+
+      test('as the cause', function(done){
+        situation.caused(situation_2, done);
+      });
+
+      test('as the effect', function(done){
+        situation.because(situation_2, done);
+      });
+
+      test('shows relationships', function(done){
+        situation.relationships(function(err, res){
+          should.not.exist(err);
+          should.exist(res);
+          res.should.be.an.instanceOf(Array);
+          res.should.have.a.lengthOf(2);
           done();
         });
       });
