@@ -1,8 +1,27 @@
 {
   "name": "cartography",
   "description": "Situations linked by Cause and Effect",
+  "version": "0.7.0",
   "author": "Jeff Marshall <jeff@classy.co>",
   "engine": "node >= 0.10.",
+  "scripts": {
+    "test": "mocha -u tdd"
+  },
+  "main": "./index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/classy/cartography.git"
+  },
+  "keywords": [
+    "cause",
+    "effect",
+    "causality",
+    "causation",
+    "causal",
+    "situation",
+    "causemap"
+  ],
+  "license": "MIT",
   "devDependencies": {
     "should": "~2.1.0",
     "mocha": "~1.14.0"
