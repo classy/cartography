@@ -12,7 +12,7 @@ var database_name = cartography.config.get('couchdb').database;
 
 
 
-suite('A Situation', function(){
+suite('Situations', function(){
   setup(function(done){
     nano.db.destroy(database_name, function(destroy_error, destroy_result){
       if (destroy_error){ 
@@ -70,6 +70,22 @@ suite('A Situation', function(){
 
     teardown(function(done){
       situation.delete(done);
+    });
+
+    test('can be a cause', function(done){
+      var situation_2 = new Situation();
+      situation_2.create(function(err, res){
+        if (err) return done(err);
+        situation.caused(situation_2, done);
+      });
+    });
+
+    test('can be an effect', function(done){
+      var situation_2 = new Situation();
+      situation_2.create(function(err, res){
+        if (err) return done(err);
+        situation.because(situation_2, done);
+      });
     });
 
     test('can be read', function(done){
@@ -382,8 +398,46 @@ suite('A Situation', function(){
                 // tags.
               });
             });
-
           });
+        });
+      });
+    });
+
+    suite('and changed', function(){
+      setup(function(done){
+        situation.title('sample situation', function(error){
+          if (error) return done(error);
+          situation.location('sample location', function(error){
+            if (error) return done(error);
+            situation.period('sample period', done);
+          })
+        });
+      });
+
+      test('shows changes in summary', function(done){
+        situation.summarize(function(err, summarized_situation){
+          if (err) return done(err);
+
+          should.exist(summarized_situation);
+          summarized_situation.should.be.an.instanceOf(Object);
+          summarized_situation.should.have.property('_id', situation.id);
+
+          summarized_situation.should.have.property(
+            'title', 
+            'sample situation'
+          );
+
+          summarized_situation.should.have.property(
+            'location', 
+            'sample location'
+          );
+
+          summarized_situation.should.have.property(
+            'period',
+            'sample period'
+          )
+
+          done();
         });
       });
     });
