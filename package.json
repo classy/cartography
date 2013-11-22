@@ -3,6 +3,7 @@
   "description": "Situations linked by Cause and Effect",
   "version": "0.7.0",
   "author": "Jeff Marshall <jeff@classy.co>",
+  "organization": "Classy",
   "engine": "node >= 0.10.",
   "scripts": {
     "test": "mocha -u tdd"
