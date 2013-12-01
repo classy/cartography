@@ -79,10 +79,10 @@ Relationship.prototype.validate = function validateRelationship(callback){
             relationship: view_result.rows[0].id
           }
 
-          return callback(error, null)
+          return async_callback(error, null)
         }
 
-        return callback(null, { does_not_exist_yet: true });
+        return async_callback(null, { does_not_exist_yet: true });
       })
     },
     existenceVerifier(cause, 'cause'),
