@@ -476,8 +476,11 @@ RevisableDoc.prototype.changes = function listRevisableDocChanges(){
     startkey: [self.id, {}],
     descending: true,
     reduce: false,
-    include_docs: true,
-    limit: options.limit
+    include_docs: true
+  }
+
+  if (options.limit && parseInt(options.limit) != NaN){
+    field_view_options.limit = options.limit;
   }
 
   db().view(
