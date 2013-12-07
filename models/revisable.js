@@ -489,7 +489,6 @@ RevisableDoc.prototype.changes = function listRevisableDocChanges(){
     field_view_options,
     function(view_error, view_result){
       if (view_error){ return callback(view_error, null) }
-      if (!view_result.rows.length){ return callback(null, undefined) }
 
       return callback(null, view_result.rows.map(
         function(row){ 
