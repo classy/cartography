@@ -46,6 +46,19 @@ module.exports = {
         var id = key[key.length -1]
         return id;
       }
+    },
+
+    total_changes: {
+      map: function(doc){
+        if (doc.type == 'change'){
+          emit([ doc.changed.doc._id, doc.changed.field.name ], null)
+        }
+      },
+
+      reduce: function(keys, values, rereduce){
+        if (rereduce) return sum(values);
+        return values.length;
+      }
     }
   }
 }

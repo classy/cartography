@@ -111,6 +111,49 @@ RevisableDoc.prototype._change = function changeRevisableDoc(
 };
 
 
+RevisableDoc.prototype.totalChanges = function totalChangesToRevisableDoc(
+  callback
+){
+  var self = this;
+  var view_options = {
+    startkey: [ self.id ],
+    endkey: [ self.id, {} ],
+  }
+
+  db().view('revisables', 'total_changes', function(view_error, view_result){
+    if (view_error) return callback(view_error, null);
+    return callback(
+      null,
+      view_result.rows.length ? view_result.rows[0].value : 0
+    )
+  })
+}
+
+
+RevisableDoc.prototype.totalChangesToField = function totalChangesToField(
+  fieldname,
+  callback
+){
+  var self = this;
+  var view_options = {
+    key: [ self.id, fieldname ]
+  }
+
+  db().view(
+    'revisables',
+    'total_changes',
+    view_options,
+    function(view_error, view_result){
+      if (view_error) return callback(view_error, null);
+      return callback(
+        null,
+        view_result.rows.length ? view_result.rows[0].value : 0
+      )
+    }
+  )
+}
+
+
 RevisableDoc.prototype.delete = function deleteRevisableDoc(callback){
   var self = this;
 
