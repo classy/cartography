@@ -461,6 +461,36 @@ suite('Situations', function(){
           done();
         });
       });
+
+      test('shows the total number of relationships', function(done){
+        situation.totalRelationships(function(error, result){
+          should.not.exist(error);
+          should.exist(result);
+          result.should.be.type('number');
+          result.should.equal(2);
+          done();
+        });
+      })
+
+      test('shows the total number of causes', function(done){
+        situation.totalCauses(function(error, result){
+          should.not.exist(error);
+          should.exist(result);
+          result.should.be.type('number');
+          result.should.equal(1);
+          done();
+        });
+      });
+
+      test('shows the total number of effects', function(done){
+        situation.totalEffects(function(error, result){
+          should.not.exist(error);
+          should.exist(result);
+          result.should.be.type('number');
+          result.should.equal(1);
+          done();
+        });
+      });
     });
   });
 });

@@ -53,6 +53,11 @@ module.exports = {
           emit([ doc.cause._id, 'cause' ], null);
           emit([ doc.effect._id, 'effect' ], null);
         }
+      },
+
+      reduce: function(keys, values, rereduce){
+        if (rereduce) return sum(values);
+        return values.length;
       }
     },
     by_cause_and_effect: {

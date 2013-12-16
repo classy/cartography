@@ -320,7 +320,8 @@ Situation.prototype.delete = function deleteSituation(callback){
 
   var view_options = {
     startkey: [ self.id ],
-    endkey: [ self.id, {} ]
+    endkey: [ self.id, {} ],
+    reduce: false
   }
 
   db().view(
@@ -381,7 +382,8 @@ Situation.prototype.relationships = function listSituationRelationships(){
   var view_options = {
     startkey: [ self.id ],
     endkey: [ self.id, {} ],
-    include_docs: true
+    include_docs: true,
+    reduce: false
   }
 
   db().view(
@@ -444,7 +446,8 @@ Situation.prototype.causes = function listSituationCauses(){
   var view_options = {
     startkey: [ self.id, 'effect' ],
     endkey: [ self.id, 'effect', {} ],
-    include_docs: true
+    include_docs: true,
+    reduce: false
   }
 
   db().view(
@@ -483,7 +486,8 @@ Situation.prototype.effects = function listSituationEffects(){
   var view_options = {
     startkey: [ self.id, 'cause' ],
     endkey: [ self.id, 'cause', {} ],
-    include_docs: true
+    include_docs: true,
+    reduce: false
   }
 
   db().view(
@@ -499,3 +503,47 @@ Situation.prototype.effects = function listSituationEffects(){
     }
   )
 }
+
+
+function relationshipTotals(type){
+  return function(callback){
+    var self = this;
+
+    if (type){
+      var opposite_type;
+
+      switch(type){
+        case 'cause': opposite_type = 'effect'; break;
+        case 'effect': opposite_type = 'cause'; break; 
+      }
+  
+      var view_options = {
+        startkey: [ self.id, opposite_type ],
+        endkey: [ self.id, opposite_type, {} ]
+      }
+    } else {
+      var view_options = {
+        startkey: [ self.id ],
+        endkey: [ self.id, {} ],
+      }
+    }
+  
+    db().view(
+      'relationships',
+      'by_cause_or_effect',
+      view_options,
+      function(view_error, view_result){
+        if (view_error) return callback(view_error, null);
+        return callback(
+          null,
+          view_result.rows.length ? view_result.rows[0].value : 0
+        )
+      }
+    )
+  }
+}
+
+
+Situation.prototype.totalRelationships = relationshipTotals();
+Situation.prototype.totalEffects = relationshipTotals('effect');
+Situation.prototype.totalCauses = relationshipTotals('cause');
