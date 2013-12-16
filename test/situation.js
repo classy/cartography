@@ -429,6 +429,18 @@ suite('Situations', function(){
             'sample period'
           )
 
+          summarized_situation.should.have.property(
+            'total_changes'
+          )
+
+          summarized_situation.should.have.property(
+            'total_causes'
+          )
+
+          summarized_situation.should.have.property(
+            'total_effects'
+          )
+
           done();
         });
       });

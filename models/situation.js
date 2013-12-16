@@ -82,6 +82,24 @@ Situation.prototype.summarize = function summarizeSituation(callback){
       doc.read(parallel_callback);
     },
     function(parallel_callback){
+      self.totalCauses(function(parallel_error, total_causes){
+        if (parallel_error) return parallel_callback(parallel_error, null);
+        return parallel_callback(null, { total_causes: total_causes });
+      })
+    },
+    function(parallel_callback){
+      self.totalEffects(function(parallel_error, total_effects){
+        if (parallel_error) return parallel_callback(parallel_error, null);
+        return parallel_callback(null, { total_effects: total_effects });
+      })
+    },
+    function(parallel_callback){
+      self.totalChanges(function(parallel_error, total_changes){
+        if (parallel_error) return parallel_callback(parallel_error, null);
+        return parallel_callback(null, { total_changes: total_changes });
+      })
+    },
+    function(parallel_callback){
       self.readFields([
         'title',
         'location',
