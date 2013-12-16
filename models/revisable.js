@@ -120,13 +120,18 @@ RevisableDoc.prototype.totalChanges = function totalChangesToRevisableDoc(
     endkey: [ self.id, {} ],
   }
 
-  db().view('revisables', 'total_changes', function(view_error, view_result){
-    if (view_error) return callback(view_error, null);
-    return callback(
-      null,
-      view_result.rows.length ? view_result.rows[0].value : 0
-    )
-  })
+  db().view(
+    'revisables', 
+    'total_changes', 
+    view_options,
+    function(view_error, view_result){
+      if (view_error) return callback(view_error, null);
+      return callback(
+        null,
+        view_result.rows.length ? view_result.rows[0].value : 0
+      )
+    }
+  )
 }
 
 
