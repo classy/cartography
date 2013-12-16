@@ -432,6 +432,14 @@ suite('Situations', function(){
           done();
         });
       });
+
+      test('its total number of changes should be accurate.', function(done){
+        situation.totalChanges(function(err, total){
+          should.not.exist(err);
+          total.should.be.type('number').above(2);
+          done();
+        })
+      })
     });
 
     suite('with relationships', function(){
