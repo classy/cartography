@@ -152,7 +152,8 @@ suite('Situations', function(){
         'title',
         'description',
         'period',
-        'location'
+        'location',
+        'alias'
       ]
 
       field_names.forEach(changeField);
@@ -161,7 +162,7 @@ suite('Situations', function(){
         var result;
 
         suiteSetup(function(done){
-          situation.alias('test', function(err, res){
+          situation.alias('derp', function(err, res){
             if (err) return done(err);
             result = res;
             return done();
@@ -186,7 +187,7 @@ suite('Situations', function(){
           });
 
           test('the change is reflected in the document body', function(){
-            situation_body.should.have.property('alias', 'test');
+            situation_body.should.have.property('alias', 'derp');
           });
         });
 
@@ -194,7 +195,7 @@ suite('Situations', function(){
           var identified_situation_id;
 
           suiteSetup(function(done){
-            Situation.identify('test', function(err, res){
+            Situation.identify('derp', function(err, res){
               if (err) return done(err);
               identified_situation_id = res;
               return done();
@@ -216,7 +217,7 @@ suite('Situations', function(){
             situation_2.create(function(creation_err, creation_res){
               if (creation_err) return done(creation_err);
 
-              situation_2.alias('test', function(err, res){
+              situation_2.alias('derp', function(err, res){
                 aliasing_result = res;
                 aliasing_error = err;
                 return done();
@@ -232,11 +233,11 @@ suite('Situations', function(){
 
         suite('and given another alias', function(){
           suiteSetup(function(done){
-            situation.alias('test2', done);
+            situation.alias('derp2', done);
           });
 
           test('it can still be identified by the old alias', function(done){
-            Situation.identify('test', function(err, id){
+            Situation.identify('derp', function(err, id){
               should.not.exist(err);
               should.exist(id);
               id.should.be.type('string');
